@@ -1,736 +1,591 @@
 <!DOCTYPE html>
-
 <html lang="cs">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>The Wisdom Project 🌟</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
 <style>
   :root {
-    --sky: #E8F4FD;
-    --sun: #FFD166;
-    --coral: #FF6B6B;
-    --mint: #06D6A0;
+    --coral:    #FF6B6B;
+    --peach:    #FF9F43;
+    --sun:      #FFD166;
+    --mint:     #06D6A0;
     --lavender: #C77DFF;
-    --peach: #FF9F43;
     --sky-blue: #4CC9F0;
-    --soft-pink: #FF85A1;
-    --warm-white: #FFFDF7;
-    --card-shadow: 0 8px 32px rgba(0,0,0,0.10);
-    --bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --pink:     #FF85A1;
+    --dark:     #3A3A5C;
+    --mid:      #7C6F8E;
+    --warm-bg:  #FFFDF7;
+    --bounce:   cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
-- { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-body {
-font-family: ‘Nunito’, sans-serif;
-background: var(–warm-white);
-min-height: 100vh;
-overflow-x: hidden;
-color: #3A3A5C;
-}
+  html, body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--warm-bg);
+    min-height: 100vh;
+    overflow-x: hidden;
+    color: var(--dark);
+  }
 
-/* ── BACKGROUND BLOBS ── */
-.bg-canvas {
-position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
-}
-.blob {
-position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.35;
-animation: blobFloat 8s ease-in-out infinite alternate;
-}
-.blob-1 { width: 400px; height: 400px; background: var(–sun);    top: -100px; left: -100px; animation-delay: 0s; }
-.blob-2 { width: 350px; height: 350px; background: var(–soft-pink); top: 30%; right: -80px; animation-delay: 2s; }
-.blob-3 { width: 300px; height: 300px; background: var(–mint);   bottom: 10%; left: 5%;   animation-delay: 4s; }
-.blob-4 { width: 250px; height: 250px; background: var(–sky-blue); bottom: -60px; right: 10%; animation-delay: 1s; }
+  /* ─── BACKGROUND BLOBS (fixed, behind everything) ─── */
+  .bg-canvas {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+  }
+  .blob {
+    position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.28;
+    animation: blobFloat 9s ease-in-out infinite alternate;
+  }
+  .blob-1 { width: 380px; height: 380px; background: #FFD166; top: -100px; left: -100px; animation-delay: 0s; }
+  .blob-2 { width: 320px; height: 320px; background: #FF85A1; top: 35%;  right: -80px;  animation-delay: 2s; }
+  .blob-3 { width: 280px; height: 280px; background: #06D6A0; bottom: 8%; left: 5%;    animation-delay: 4s; }
+  .blob-4 { width: 240px; height: 240px; background: #4CC9F0; bottom: -50px; right: 8%; animation-delay: 1s; }
 
-@keyframes blobFloat {
-from { transform: translate(0, 0) scale(1); }
-to   { transform: translate(30px, 20px) scale(1.08); }
-}
+  @keyframes blobFloat {
+    from { transform: translate(0,0) scale(1); }
+    to   { transform: translate(25px, 18px) scale(1.07); }
+  }
 
-/* ── FLOATING STARS ── */
-.stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-.star {
-position: absolute;
-font-size: 1.2rem;
-animation: starTwinkle 3s ease-in-out infinite alternate;
-opacity: 0.7;
-}
-@keyframes starTwinkle {
-from { transform: scale(1) rotate(0deg); opacity: 0.5; }
-to   { transform: scale(1.4) rotate(20deg); opacity: 1; }
-}
+  /* ─── FLOATING STARS (behind content, pointer-none) ─── */
+  .stars { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+  .star  {
+    position: absolute; opacity: 0.55;
+    animation: twinkle 3s ease-in-out infinite alternate;
+  }
+  @keyframes twinkle {
+    from { transform: scale(1) rotate(0deg); opacity: 0.4; }
+    to   { transform: scale(1.3) rotate(15deg); opacity: 0.75; }
+  }
 
-/* ── LAYOUT ── */
-.screen {
-position: relative; z-index: 1;
-min-height: 100vh;
-display: none;
-flex-direction: column;
-padding: 0 0 100px 0;
-}
-.screen.active { display: flex; }
+  /* ─── SCREENS ─── */
+  .screen {
+    position: relative; z-index: 2; /* above blobs & stars */
+    min-height: 100vh;
+    display: none;
+    flex-direction: column;
+    padding-bottom: 90px;
+  }
+  .screen.active { display: flex; }
 
-/* ── TOP HEADER ── */
-.top-header {
-text-align: center;
-padding: 36px 24px 20px;
-}
+  /* ─── HEADER ─── */
+  .top-header { text-align: center; padding: 36px 24px 16px; }
 
-.logo-badge {
-display: inline-flex;
-align-items: center;
-gap: 10px;
-background: white;
-border-radius: 50px;
-padding: 10px 22px;
-box-shadow: 0 4px 20px rgba(0,0,0,0.10);
-margin-bottom: 20px;
-font-size: 0.85rem;
-font-weight: 700;
-color: #7C6F8E;
-letter-spacing: 1.5px;
-text-transform: uppercase;
-}
+  .logo-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: white; border-radius: 50px; padding: 8px 20px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.10);
+    margin-bottom: 18px;
+    font-size: 0.78rem; font-weight: 800; color: var(--mid);
+    letter-spacing: 1.5px; text-transform: uppercase;
+  }
 
-.main-title {
-font-family: ‘Fredoka One’, cursive;
-font-size: clamp(2.8rem, 8vw, 4.5rem);
-line-height: 1.05;
-background: linear-gradient(135deg, #FF6B6B 0%, #FF9F43 40%, #FFD166 100%);
--webkit-background-clip: text;
--webkit-text-fill-color: transparent;
-background-clip: text;
-margin-bottom: 12px;
-}
+  .main-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(2.6rem, 9vw, 4.4rem);
+    line-height: 1.05;
+    background: linear-gradient(135deg, #FF6B6B 0%, #FF9F43 45%, #FFD166 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+  }
 
-.main-subtitle {
-font-size: 1.1rem;
-font-weight: 600;
-color: #7C6F8E;
-max-width: 320px;
-margin: 0 auto 24px;
-line-height: 1.5;
-}
+  .main-subtitle {
+    font-size: 1rem; font-weight: 600; color: var(--mid);
+    max-width: 300px; margin: 0 auto 20px; line-height: 1.5;
+  }
 
-/* ── QUOTE CARD ── */
-.quote-card {
-background: white;
-border-radius: 24px;
-padding: 24px 28px;
-margin: 0 20px 28px;
-box-shadow: var(–card-shadow);
-position: relative;
-overflow: hidden;
-text-align: center;
-border: 3px solid var(–sun);
-}
-.quote-card::before {
-content: ‘💬’;
-font-size: 2.5rem;
-display: block;
-margin-bottom: 10px;
-}
-.quote-text {
-font-size: 1.05rem;
-font-weight: 700;
-color: #3A3A5C;
-line-height: 1.5;
-font-style: italic;
-}
-.quote-author {
-font-size: 0.85rem;
-font-weight: 800;
-color: var(–coral);
-margin-top: 10px;
-text-transform: uppercase;
-letter-spacing: 1px;
-}
+  /* ─── QUOTE CARD ─── */
+  .quote-card {
+    background: white; border-radius: 22px;
+    padding: 22px 24px; margin: 0 18px 24px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.09);
+    text-align: center; border: 3px solid #FFD166;
+  }
+  .quote-card::before { content: '💬'; font-size: 2.2rem; display: block; margin-bottom: 8px; }
+  .quote-text  { font-size: 1rem; font-weight: 700; color: var(--dark); line-height: 1.55; font-style: italic; }
+  .quote-author { font-size: 0.82rem; font-weight: 800; color: var(--coral); margin-top: 8px; text-transform: uppercase; letter-spacing: 1px; }
 
-/* ── BIG ACTION BUTTON ── */
-.big-btn {
-display: block;
-margin: 0 24px 16px;
-padding: 20px 28px;
-border-radius: 20px;
-border: none;
-cursor: pointer;
-text-align: center;
-text-decoration: none;
-font-family: ‘Nunito’, sans-serif;
-font-weight: 800;
-font-size: 1.15rem;
-transition: transform 0.2s var(–bounce), box-shadow 0.2s ease;
-position: relative;
-overflow: hidden;
-}
-.big-btn:active { transform: scale(0.96) !important; }
-.big-btn:hover  { transform: translateY(-3px) scale(1.02); }
+  /* ─────────────────────────────────────────
+     BIG BUTTONS — KEY FIX: -webkit-appearance
+     ───────────────────────────────────────── */
+  .big-btn {
+    display: block;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0 18px 14px;
+    padding: 20px 24px;
+    border-radius: 22px;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: #fff !important;
+    transition: transform 0.2s var(--bounce), box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+  }
+  .big-btn:active { transform: scale(0.95) !important; }
+  .big-btn:hover  { transform: translateY(-3px) scale(1.02); }
 
-.btn-feel {
-background: linear-gradient(135deg, var(–coral), var(–peach));
-color: white;
-box-shadow: 0 8px 24px rgba(255, 107, 107, 0.40);
-}
-.btn-wisdom {
-background: linear-gradient(135deg, var(–lavender), var(–sky-blue));
-color: white;
-box-shadow: 0 8px 24px rgba(199, 125, 255, 0.40);
-}
-.btn-soon {
-background: linear-gradient(135deg, var(–mint), #00C896);
-color: white;
-box-shadow: 0 8px 24px rgba(6, 214, 160, 0.35);
-opacity: 0.75;
-}
+  /* Solid fallback + gradient on top */
+  .btn-feel   { background-color: #FF6B6B; background-image: linear-gradient(135deg, #FF6B6B 0%, #FF9F43 100%); box-shadow: 0 8px 22px rgba(255,107,107,0.45); }
+  .btn-wisdom { background-color: #C77DFF; background-image: linear-gradient(135deg, #C77DFF 0%, #4CC9F0 100%); box-shadow: 0 8px 22px rgba(199,125,255,0.45); }
+  .btn-soon   { background-color: #06D6A0; background-image: linear-gradient(135deg, #06D6A0 0%, #00BFAE 100%); box-shadow: 0 8px 22px rgba(6,214,160,0.38); opacity: 0.78; cursor: default; }
 
-.big-btn .btn-icon { font-size: 1.8rem; display: block; margin-bottom: 4px; }
-.big-btn .btn-label { display: block; font-size: 1.2rem; }
-.big-btn .btn-desc  { display: block; font-size: 0.82rem; font-weight: 600; opacity: 0.85; margin-top: 2px; }
+  .big-btn .btn-icon  { font-size: 1.9rem; display: block; margin-bottom: 4px; }
+  .big-btn .btn-label { display: block; font-size: 1.15rem; color: white; }
+  .big-btn .btn-desc  { display: block; font-size: 0.8rem; font-weight: 600; color: rgba(255,255,255,0.88); margin-top: 3px; }
 
-/* ── BOTTOM NAV ── */
-.bottom-nav {
-position: fixed;
-bottom: 0; left: 0; right: 0;
-background: white;
-display: flex;
-justify-content: space-around;
-align-items: center;
-padding: 10px 0 16px;
-box-shadow: 0 -4px 24px rgba(0,0,0,0.10);
-z-index: 100;
-border-top: 3px solid #F0EEF8;
-}
-.nav-btn {
-display: flex; flex-direction: column; align-items: center; gap: 3px;
-background: none; border: none; cursor: pointer;
-font-family: ‘Nunito’, sans-serif;
-font-weight: 700; font-size: 0.72rem; color: #AAA0BF;
-transition: all 0.2s var(–bounce);
-padding: 4px 16px;
-border-radius: 16px;
-}
-.nav-btn.active { color: var(–coral); }
-.nav-btn.active .nav-icon { transform: scale(1.25); }
-.nav-icon { font-size: 1.6rem; transition: transform 0.2s var(–bounce); }
+  .soon-badge {
+    display: inline-block; background: rgba(255,255,255,0.3); color: white;
+    font-size: 0.65rem; font-weight: 800; padding: 2px 9px;
+    border-radius: 50px; text-transform: uppercase; letter-spacing: 1px; margin-left: 6px;
+  }
 
-/* ── FEELINGS SCREEN ── */
-.screen-title {
-font-family: ‘Fredoka One’, cursive;
-font-size: 2rem;
-text-align: center;
-margin: 28px 24px 8px;
-}
-.screen-sub {
-text-align: center;
-font-weight: 600;
-color: #7C6F8E;
-font-size: 0.95rem;
-margin: 0 24px 20px;
-line-height: 1.5;
-}
+  /* ─── BOTTOM NAV ─── */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+    background: white; display: flex; justify-content: space-around; align-items: center;
+    padding: 10px 0 env(safe-area-inset-bottom, 14px);
+    box-shadow: 0 -3px 20px rgba(0,0,0,0.09);
+    border-top: 2.5px solid #F0EEF8;
+  }
+  .nav-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    background: none; border: none; cursor: pointer;
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.7rem; color: #B5ABCC;
+    padding: 4px 20px; border-radius: 14px;
+    -webkit-appearance: none;
+    transition: all 0.2s var(--bounce);
+  }
+  .nav-btn.active { color: var(--coral); }
+  .nav-btn.active .nav-icon { transform: scale(1.22); }
+  .nav-icon { font-size: 1.55rem; transition: transform 0.2s var(--bounce); }
 
-.feelings-grid {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 14px;
-padding: 0 18px;
-}
+  /* ─── SCREEN TITLE / SUB ─── */
+  .screen-title {
+    font-family: 'Fredoka One', cursive; font-size: 1.9rem;
+    text-align: center; margin: 26px 24px 6px;
+  }
+  .screen-sub {
+    text-align: center; font-weight: 600; color: var(--mid);
+    font-size: 0.9rem; margin: 0 24px 18px; line-height: 1.55;
+  }
 
-.feeling-card {
-background: white;
-border-radius: 20px;
-padding: 18px 14px;
-text-align: center;
-cursor: pointer;
-border: 3px solid transparent;
-box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-transition: all 0.25s var(–bounce);
-font-family: ‘Nunito’, sans-serif;
-}
-.feeling-card:active { transform: scale(0.94); }
-.feeling-card:hover  { transform: translateY(-4px); box-shadow: 0 10px 28px rgba(0,0,0,0.14); }
+  /* ─── FEELINGS GRID ─── */
+  .feelings-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px; padding: 0 16px;
+  }
+  .feeling-card {
+    background: white; border-radius: 18px; padding: 16px 12px;
+    text-align: center; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    transition: all 0.22s var(--bounce);
+    border: 3px solid #F0EEF8;
+    -webkit-appearance: none;
+  }
+  .feeling-card:active { transform: scale(0.93); }
+  .feeling-card:hover  { transform: translateY(-4px); box-shadow: 0 10px 26px rgba(0,0,0,0.13); }
 
-.feeling-card[data-color=“coral”]    { border-color: var(–coral);    }
-.feeling-card[data-color=“peach”]    { border-color: var(–peach);    }
-.feeling-card[data-color=“lavender”] { border-color: var(–lavender); }
-.feeling-card[data-color=“mint”]     { border-color: var(–mint);     }
-.feeling-card[data-color=“sky”]      { border-color: var(–sky-blue); }
-.feeling-card[data-color=“pink”]     { border-color: var(–soft-pink);}
+  .feeling-card[data-color="coral"]    { border-color: var(--coral); }
+  .feeling-card[data-color="peach"]    { border-color: var(--peach); }
+  .feeling-card[data-color="lavender"] { border-color: var(--lavender); }
+  .feeling-card[data-color="mint"]     { border-color: var(--mint); }
+  .feeling-card[data-color="sky"]      { border-color: var(--sky-blue); }
+  .feeling-card[data-color="pink"]     { border-color: var(--pink); }
 
-.feeling-emoji { font-size: 2.4rem; display: block; margin-bottom: 8px; }
-.feeling-title { font-weight: 800; font-size: 0.9rem; color: #3A3A5C; margin-bottom: 4px; }
-.feeling-desc  { font-weight: 600; font-size: 0.73rem; color: #9990B0; line-height: 1.35; }
+  .feeling-emoji { font-size: 2.2rem; display: block; margin-bottom: 6px; }
+  .feeling-title { font-weight: 800; font-size: 0.87rem; color: var(--dark); margin-bottom: 3px; }
+  .feeling-desc  { font-weight: 600; font-size: 0.7rem; color: #9990B0; line-height: 1.35; }
 
-/* ── RESPONSE SCREEN ── */
-.back-btn {
-display: inline-flex; align-items: center; gap: 8px;
-background: white; border: none; cursor: pointer;
-font-family: ‘Nunito’, sans-serif;
-font-weight: 700; font-size: 1rem; color: #7C6F8E;
-padding: 12px 20px; margin: 20px;
-border-radius: 50px;
-box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-transition: all 0.2s var(–bounce);
-}
-.back-btn:hover { transform: translateX(-3px); }
+  /* ─── RESPONSE SCREEN ─── */
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: white; border: none; cursor: pointer;
+    font-family: 'Nunito', sans-serif; font-weight: 700;
+    font-size: 0.95rem; color: var(--mid);
+    padding: 10px 18px; margin: 18px;
+    border-radius: 50px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    -webkit-appearance: none;
+    transition: transform 0.2s var(--bounce);
+  }
+  .back-btn:hover { transform: translateX(-3px); }
 
-.response-hero {
-background: white;
-border-radius: 28px;
-margin: 0 18px 20px;
-padding: 28px 24px;
-box-shadow: var(–card-shadow);
-text-align: center;
-}
-.response-emoji { font-size: 4rem; margin-bottom: 12px; display: block; }
-.response-title {
-font-family: ‘Fredoka One’, cursive;
-font-size: 1.7rem;
-margin-bottom: 10px;
-color: #3A3A5C;
-}
-.response-body {
-font-size: 1rem;
-font-weight: 600;
-color: #5A5270;
-line-height: 1.65;
-}
+  .response-hero {
+    background: white; border-radius: 26px;
+    margin: 0 16px 16px; padding: 26px 22px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.09); text-align: center;
+  }
+  .response-emoji { font-size: 3.6rem; margin-bottom: 10px; display: block; animation: pulseEmoji 2.5s ease-in-out infinite; }
+  @keyframes pulseEmoji { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
-.wisdom-pill {
-display: inline-block;
-background: linear-gradient(135deg, var(–sun), var(–peach));
-color: white;
-font-weight: 800;
-font-size: 0.78rem;
-padding: 5px 14px;
-border-radius: 50px;
-margin: 12px 0 0;
-text-transform: uppercase;
-letter-spacing: 0.8px;
-}
+  .response-title { font-family: 'Fredoka One', cursive; font-size: 1.6rem; margin-bottom: 10px; color: var(--dark); }
+  .response-body  { font-size: 0.97rem; font-weight: 600; color: #5A5270; line-height: 1.65; }
+  .wisdom-pill {
+    display: inline-block; background: linear-gradient(135deg, #FFD166, #FF9F43);
+    color: white; font-weight: 800; font-size: 0.75rem;
+    padding: 5px 14px; border-radius: 50px; margin: 12px 0 0;
+    text-transform: uppercase; letter-spacing: 0.8px;
+  }
 
-.stoic-box {
-background: linear-gradient(135deg, #F8F0FF, #E8F4FD);
-border-radius: 20px;
-padding: 20px 22px;
-margin: 0 18px 16px;
-border-left: 5px solid var(–lavender);
-}
-.stoic-label {
-font-size: 0.75rem; font-weight: 800; color: var(–lavender);
-text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;
-}
-.stoic-quote { font-size: 1rem; font-weight: 700; color: #3A3A5C; line-height: 1.5; font-style: italic; }
-.stoic-by    { font-size: 0.82rem; font-weight: 700; color: var(–lavender); margin-top: 6px; }
+  /* ─── VIDEO SECTION ─── */
+  .video-section {
+    margin: 0 16px 16px;
+    border-radius: 22px; overflow: hidden;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+  }
+  .video-label {
+    background: linear-gradient(135deg, var(--dark), #5A4070);
+    color: white; font-weight: 800; font-size: 0.8rem;
+    padding: 12px 18px; display: flex; align-items: center; gap: 8px;
+    text-transform: uppercase; letter-spacing: 0.8px;
+  }
+  .video-label span { font-size: 1.1rem; }
+  .video-wrapper {
+    position: relative; width: 100%; padding-top: 56.25%; /* 16:9 */
+    background: #1a1a2e;
+  }
+  .video-wrapper iframe {
+    position: absolute; inset: 0; width: 100%; height: 100%; border: none;
+  }
+  .video-coming-soon {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #2D2B55, #1a1a2e);
+    color: white; text-align: center; padding: 24px;
+  }
+  .video-coming-soon .cs-icon { font-size: 3rem; margin-bottom: 10px; }
+  .video-coming-soon h4 { font-family: 'Fredoka One', cursive; font-size: 1.3rem; margin-bottom: 6px; }
+  .video-coming-soon p  { font-size: 0.85rem; font-weight: 600; opacity: 0.8; line-height: 1.5; }
+  .video-channel-badge {
+    background: rgba(255,255,255,0.12); border-radius: 50px;
+    padding: 6px 16px; font-size: 0.75rem; font-weight: 800;
+    margin-top: 12px; display: inline-block; letter-spacing: 0.5px;
+  }
 
-.practice-box {
-background: white;
-border-radius: 20px;
-padding: 20px 22px;
-margin: 0 18px 16px;
-box-shadow: 0 4px 16px rgba(0,0,0,0.07);
-border-top: 4px solid var(–mint);
-}
-.practice-label {
-font-size: 0.75rem; font-weight: 800; color: var(–mint);
-text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;
-}
-.practice-steps { list-style: none; }
-.practice-steps li {
-padding: 7px 0; font-weight: 600; font-size: 0.95rem; color: #5A5270;
-display: flex; gap: 10px; align-items: flex-start;
-border-bottom: 1px solid #F0EEF8;
-}
-.practice-steps li:last-child { border-bottom: none; }
-.step-num {
-background: var(–mint); color: white; font-weight: 800;
-width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
-display: flex; align-items: center; justify-content: center; font-size: 0.78rem;
-}
+  /* ─── STOIC BOX ─── */
+  .stoic-box {
+    background: linear-gradient(135deg, #F8F0FF, #EEF4FF);
+    border-radius: 18px; padding: 18px 20px;
+    margin: 0 16px 14px; border-left: 5px solid var(--lavender);
+  }
+  .stoic-label { font-size: 0.72rem; font-weight: 800; color: var(--lavender); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .stoic-quote { font-size: 0.97rem; font-weight: 700; color: var(--dark); line-height: 1.55; font-style: italic; }
+  .stoic-by    { font-size: 0.8rem; font-weight: 700; color: var(--lavender); margin-top: 6px; }
 
-.you-are-not-alone {
-background: linear-gradient(135deg, var(–coral), var(–soft-pink));
-color: white;
-border-radius: 20px;
-margin: 0 18px 16px;
-padding: 20px 24px;
-text-align: center;
-font-weight: 800;
-font-size: 1.1rem;
-line-height: 1.5;
-box-shadow: 0 6px 20px rgba(255,107,107,0.3);
-}
-.you-are-not-alone span { font-size: 2rem; display: block; margin-bottom: 8px; }
+  /* ─── PRACTICE BOX ─── */
+  .practice-box {
+    background: white; border-radius: 18px;
+    padding: 18px 20px; margin: 0 16px 14px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.07);
+    border-top: 4px solid var(--mint);
+  }
+  .practice-label { font-size: 0.72rem; font-weight: 800; color: var(--mint); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .practice-steps { list-style: none; }
+  .practice-steps li {
+    padding: 7px 0; font-weight: 600; font-size: 0.92rem; color: #5A5270;
+    display: flex; gap: 10px; align-items: flex-start;
+    border-bottom: 1px solid #F4F0FF;
+  }
+  .practice-steps li:last-child { border-bottom: none; }
+  .step-num {
+    background: var(--mint); color: white; font-weight: 800;
+    width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 0.75rem;
+  }
 
-/* ── WISDOM SCREEN ── */
-.values-list { padding: 0 18px; display: flex; flex-direction: column; gap: 16px; }
+  /* ─── NOT ALONE BANNER ─── */
+  .you-are-not-alone {
+    background: linear-gradient(135deg, var(--coral), var(--pink));
+    color: white; border-radius: 18px;
+    margin: 0 16px 16px; padding: 20px 22px;
+    text-align: center; font-weight: 800; font-size: 1.05rem; line-height: 1.55;
+    box-shadow: 0 6px 20px rgba(255,107,107,0.28);
+  }
+  .you-are-not-alone span { font-size: 1.9rem; display: block; margin-bottom: 6px; }
 
-.value-card {
-background: white;
-border-radius: 24px;
-padding: 22px 20px;
-box-shadow: 0 4px 18px rgba(0,0,0,0.08);
-display: flex; gap: 16px; align-items: flex-start;
-transition: all 0.25s var(–bounce);
-cursor: pointer;
-}
-.value-card:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,0,0,0.12); }
+  /* ─── WISDOM SCREEN ─── */
+  .values-list { padding: 0 16px; display: flex; flex-direction: column; gap: 14px; }
+  .value-card {
+    background: white; border-radius: 22px; padding: 20px 18px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    display: flex; gap: 14px; align-items: flex-start;
+    transition: all 0.22s var(--bounce); cursor: pointer;
+  }
+  .value-card:hover { transform: translateY(-3px); box-shadow: 0 10px 26px rgba(0,0,0,0.11); }
 
-.value-num {
-width: 50px; height: 50px; border-radius: 16px; flex-shrink: 0;
-display: flex; align-items: center; justify-content: center;
-font-size: 1.6rem;
-}
-.value-num.c1 { background: #FFF0F0; }
-.value-num.c2 { background: #FFF5E0; }
-.value-num.c3 { background: #F0F0FF; }
-.value-num.c4 { background: #E0FFF5; }
-.value-num.c5 { background: #E0F5FF; }
-.value-num.c6 { background: #F5E0FF; }
+  .value-icon {
+    width: 48px; height: 48px; border-radius: 14px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 1.55rem;
+  }
+  .vi1 { background: #FFF0F0; } .vi2 { background: #FFF6E0; } .vi3 { background: #F2F0FF; }
+  .vi4 { background: #E0FFF5; } .vi5 { background: #E0F6FF; } .vi6 { background: #F6E0FF; }
 
-.value-content {}
-.value-name { font-family: ‘Fredoka One’, cursive; font-size: 1.3rem; color: #3A3A5C; margin-bottom: 5px; }
-.value-desc { font-weight: 600; font-size: 0.88rem; color: #7C6F8E; line-height: 1.5; }
+  .value-name { font-family: 'Fredoka One', cursive; font-size: 1.25rem; color: var(--dark); margin-bottom: 4px; }
+  .value-desc { font-weight: 600; font-size: 0.86rem; color: var(--mid); line-height: 1.5; }
 
-.quotes-section { margin: 28px 18px 0; }
-.quotes-title {
-font-family: ‘Fredoka One’, cursive;
-font-size: 1.4rem; margin-bottom: 16px;
-display: flex; align-items: center; gap: 8px;
-}
-.philosopher-card {
-background: #F8F6FF;
-border-radius: 20px;
-padding: 18px 20px;
-margin-bottom: 12px;
-border-left: 4px solid var(–lavender);
-}
-.phil-quote { font-size: 0.98rem; font-weight: 700; color: #3A3A5C; font-style: italic; line-height: 1.55; }
-.phil-name  { font-size: 0.78rem; font-weight: 800; color: var(–lavender); margin-top: 8px; text-transform: uppercase; letter-spacing: 1px; }
+  .quotes-section { margin: 24px 16px 0; }
+  .quotes-title { font-family: 'Fredoka One', cursive; font-size: 1.35rem; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .philosopher-card {
+    background: #F9F6FF; border-radius: 18px; padding: 16px 18px;
+    margin-bottom: 10px; border-left: 4px solid var(--lavender);
+  }
+  .phil-quote { font-size: 0.95rem; font-weight: 700; color: var(--dark); font-style: italic; line-height: 1.55; }
+  .phil-name  { font-size: 0.76rem; font-weight: 800; color: var(--lavender); margin-top: 7px; text-transform: uppercase; letter-spacing: 1px; }
 
-/* ── MISSION BANNER ── */
-.mission-banner {
-background: linear-gradient(135deg, #3A3A5C, #5A4070);
-color: white;
-border-radius: 24px;
-margin: 0 18px 20px;
-padding: 24px;
-text-align: center;
-box-shadow: 0 8px 28px rgba(58,58,92,0.30);
-}
-.mission-banner .m-icon { font-size: 2.5rem; margin-bottom: 10px; display: block; }
-.mission-banner h3 { font-family: ‘Fredoka One’, cursive; font-size: 1.4rem; margin-bottom: 8px; }
-.mission-banner p  { font-weight: 600; font-size: 0.9rem; line-height: 1.55; opacity: 0.9; }
+  /* ─── MISSION BANNER ─── */
+  .mission-banner {
+    background: linear-gradient(135deg, #3A3A5C, #5A4070); color: white;
+    border-radius: 22px; margin: 0 16px 18px; padding: 22px;
+    text-align: center; box-shadow: 0 8px 26px rgba(58,58,92,0.28);
+  }
+  .mission-banner .m-icon { font-size: 2.2rem; margin-bottom: 8px; display: block; }
+  .mission-banner h3 { font-family: 'Fredoka One', cursive; font-size: 1.3rem; margin-bottom: 7px; }
+  .mission-banner p  { font-weight: 600; font-size: 0.88rem; line-height: 1.55; opacity: 0.9; }
 
-/* ── ENTRANCE ANIMATIONS ── */
-@keyframes slideUp {
-from { opacity: 0; transform: translateY(30px); }
-to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes popIn {
-from { opacity: 0; transform: scale(0.85); }
-to   { opacity: 1; transform: scale(1); }
-}
-@keyframes wiggle {
-0%,100% { transform: rotate(0deg); }
-25%      { transform: rotate(-8deg); }
-75%      { transform: rotate(8deg); }
-}
+  /* ─── ANIMATIONS ─── */
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.82); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  .anim-slide { animation: slideUp 0.45s var(--bounce) both; }
+  .anim-pop   { animation: popIn  0.38s var(--bounce) both; }
+  .d1 { animation-delay: 0.05s; } .d2 { animation-delay: 0.10s; } .d3 { animation-delay: 0.15s; }
+  .d4 { animation-delay: 0.20s; } .d5 { animation-delay: 0.25s; } .d6 { animation-delay: 0.30s; }
+  .d7 { animation-delay: 0.35s; } .d8 { animation-delay: 0.40s; }
 
-.animate-slide { animation: slideUp 0.5s var(–bounce) both; }
-.animate-pop   { animation: popIn  0.4s var(–bounce) both; }
-
-.delay-1 { animation-delay: 0.05s; }
-.delay-2 { animation-delay: 0.10s; }
-.delay-3 { animation-delay: 0.15s; }
-.delay-4 { animation-delay: 0.20s; }
-.delay-5 { animation-delay: 0.25s; }
-.delay-6 { animation-delay: 0.30s; }
-.delay-7 { animation-delay: 0.35s; }
-.delay-8 { animation-delay: 0.40s; }
-
-/* ── PULSE on hero emoji ── */
-.pulse {
-animation: pulseEmoji 2.5s ease-in-out infinite;
-}
-@keyframes pulseEmoji {
-0%,100% { transform: scale(1); }
-50%      { transform: scale(1.1); }
-}
-
-/* ── SOON badge ── */
-.soon-badge {
-display: inline-block;
-background: var(–mint);
-color: white;
-font-size: 0.68rem;
-font-weight: 800;
-padding: 3px 10px;
-border-radius: 50px;
-text-transform: uppercase;
-letter-spacing: 1px;
-margin-left: 6px;
-vertical-align: middle;
-}
-
-/* Scroll behaviour */
-html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; }
 </style>
-
 </head>
 <body>
 
-<!-- Decorative background -->
-
+<!-- Blobs (z-index 0) -->
 <div class="bg-canvas">
-  <div class="blob blob-1"></div>
-  <div class="blob blob-2"></div>
-  <div class="blob blob-3"></div>
-  <div class="blob blob-4"></div>
+  <div class="blob blob-1"></div><div class="blob blob-2"></div>
+  <div class="blob blob-3"></div><div class="blob blob-4"></div>
 </div>
+
+<!-- Stars (z-index 1) -->
 <div class="stars" id="starsContainer"></div>
 
-<!-- ════════════════ HOME SCREEN ════════════════ -->
-
+<!-- ══════════════════════════════════
+     HOME SCREEN
+══════════════════════════════════ -->
 <div class="screen active" id="screen-home">
-
-  <div class="top-header animate-slide">
+  <div class="top-header anim-slide">
     <div class="logo-badge">✨ A Life's Calling</div>
     <h1 class="main-title">The Wisdom<br>Project</h1>
     <p class="main-subtitle">Ancient wisdom. Real feelings.<br>Made for kids like you. 🌱</p>
   </div>
 
-  <div class="quote-card animate-slide delay-2">
+  <div class="quote-card anim-slide d2">
     <p class="quote-text">"Do you have the patience to wait until your mud settles and the water is clear?"</p>
     <p class="quote-author">— Lao Tzu</p>
   </div>
 
-  <button class="big-btn btn-feel animate-pop delay-3" onclick="goTo('screen-feel')">
+  <button class="big-btn btn-feel anim-pop d3" onclick="goTo('screen-feel')">
     <span class="btn-icon">💭</span>
     <span class="btn-label">How Do I Feel?</span>
     <span class="btn-desc">Bullied? Scared? Angry? Find your wisdom →</span>
   </button>
 
-  <button class="big-btn btn-wisdom animate-pop delay-4" onclick="goTo('screen-wisdom')">
+  <button class="big-btn btn-wisdom anim-pop d4" onclick="goTo('screen-wisdom')">
     <span class="btn-icon">🌿</span>
     <span class="btn-label">Stoic Wisdom</span>
     <span class="btn-desc">6 big values from the greatest minds ever →</span>
   </button>
 
-  <button class="big-btn btn-soon animate-pop delay-5" style="cursor:default;">
+  <button class="big-btn btn-soon anim-pop d5">
     <span class="btn-icon">🎵</span>
     <span class="btn-label">Music & Healing <span class="soon-badge">Soon</span></span>
-    <span class="btn-desc">Healing music sessions with Edita. 🎶</span>
+    <span class="btn-desc">Healing music sessions with Edita 🎶</span>
   </button>
 
-  <div class="mission-banner animate-slide delay-6">
+  <div class="mission-banner anim-slide d6">
     <span class="m-icon">⭐</span>
     <h3>Our Mission</h3>
     <p>Teaching kids <strong>Stoicism, values & kindness</strong> — so every child knows they are never alone with a big feeling.</p>
   </div>
-
 </div>
 
-<!-- ════════════════ FEEL SCREEN ════════════════ -->
-
+<!-- ══════════════════════════════════
+     FEEL SCREEN
+══════════════════════════════════ -->
 <div class="screen" id="screen-feel">
-
-  <h2 class="screen-title animate-slide">💭 How Do I Feel?</h2>
-  <p class="screen-sub animate-slide delay-1">Tap what you're feeling right now.<br>You'll get real wisdom — and you are <strong>NOT alone</strong>. 💛</p>
+  <h2 class="screen-title anim-slide">💭 How Do I Feel?</h2>
+  <p class="screen-sub anim-slide d1">Tap what you're feeling right now.<br>You'll get real wisdom — you are <strong>NOT alone</strong>. 💛</p>
 
   <div class="feelings-grid">
-    <div class="feeling-card animate-pop delay-1" data-color="coral" onclick="showResponse('mean')">
+    <div class="feeling-card anim-pop d1" data-color="coral"    onclick="showResponse('mean')">
       <span class="feeling-emoji">😤</span>
       <div class="feeling-title">Someone was mean to me</div>
       <div class="feeling-desc">Bullying, cruel words, left out on purpose</div>
     </div>
-    <div class="feeling-card animate-pop delay-2" data-color="peach" onclick="showResponse('scared')">
+    <div class="feeling-card anim-pop d2" data-color="peach"    onclick="showResponse('scared')">
       <span class="feeling-emoji">😨</span>
       <div class="feeling-title">Scared about the future</div>
       <div class="feeling-desc">School, exams, change, the unknown</div>
     </div>
-    <div class="feeling-card animate-pop delay-3" data-color="lavender" onclick="showResponse('regret')">
+    <div class="feeling-card anim-pop d3" data-color="lavender" onclick="showResponse('regret')">
       <span class="feeling-emoji">😔</span>
       <div class="feeling-title">I regret something</div>
       <div class="feeling-desc">Said something wrong, hurt someone</div>
     </div>
-    <div class="feeling-card animate-pop delay-4" data-color="mint" onclick="showResponse('family')">
+    <div class="feeling-card anim-pop d4" data-color="mint"     onclick="showResponse('family')">
       <span class="feeling-emoji">🏠</span>
       <div class="feeling-title">Fighting with family</div>
       <div class="feeling-desc">Parents, siblings, arguments at home</div>
     </div>
-    <div class="feeling-card animate-pop delay-5" data-color="sky" onclick="showResponse('alone')">
+    <div class="feeling-card anim-pop d5" data-color="sky"      onclick="showResponse('alone')">
       <span class="feeling-emoji">🌧️</span>
       <div class="feeling-title">I feel left out</div>
       <div class="feeling-desc">Lonely, invisible, like nobody cares</div>
     </div>
-    <div class="feeling-card animate-pop delay-6" data-color="coral" onclick="showResponse('angry')">
+    <div class="feeling-card anim-pop d6" data-color="coral"    onclick="showResponse('angry')">
       <span class="feeling-emoji">🔥</span>
       <div class="feeling-title">I feel really angry</div>
       <div class="feeling-desc">Rage, frustration, it's not fair</div>
     </div>
-    <div class="feeling-card animate-pop delay-7" data-color="pink" onclick="showResponse('forgive')">
+    <div class="feeling-card anim-pop d7" data-color="pink"     onclick="showResponse('forgive')">
       <span class="feeling-emoji">🕊️</span>
       <div class="feeling-title">I need to forgive</div>
       <div class="feeling-desc">Someone hurt me and I'm still carrying it</div>
     </div>
-    <div class="feeling-card animate-pop delay-8" data-color="lavender" onclick="showResponse('lost')">
+    <div class="feeling-card anim-pop d8" data-color="lavender" onclick="showResponse('lost')">
       <span class="feeling-emoji">🌱</span>
       <div class="feeling-title">Who even am I?</div>
       <div class="feeling-desc">Lost, confused, searching for myself</div>
     </div>
   </div>
-
 </div>
 
-<!-- ════════════════ RESPONSE SCREEN ════════════════ -->
-
+<!-- ══════════════════════════════════
+     RESPONSE SCREEN
+══════════════════════════════════ -->
 <div class="screen" id="screen-response">
   <button class="back-btn" onclick="goTo('screen-feel')">← Back</button>
   <div id="response-content"></div>
 </div>
 
-<!-- ════════════════ WISDOM SCREEN ════════════════ -->
-
+<!-- ══════════════════════════════════
+     WISDOM SCREEN
+══════════════════════════════════ -->
 <div class="screen" id="screen-wisdom">
-
-  <h2 class="screen-title animate-slide">⭐ Wisdom</h2>
-  <p class="screen-sub animate-slide delay-1">The 6 Big Values 🌿<br>Not rules — <strong>truths</strong>. Lived and proven by real humans.</p>
+  <h2 class="screen-title anim-slide">⭐ Wisdom</h2>
+  <p class="screen-sub anim-slide d1">The 6 Big Values 🌿<br>Not rules — <strong>truths</strong> lived by real humans.</p>
 
   <div class="values-list">
-    <div class="value-card animate-slide delay-1">
-      <div class="value-num c1">❤️</div>
-      <div class="value-content">
-        <div class="value-name">Forgiveness</div>
-        <div class="value-desc">The wound became the wisdom. Forgiveness doesn't mean what happened was OK — it means you choose to put the heavy stone down. You forgive for <em>you</em>.</div>
-      </div>
+    <div class="value-card anim-slide d1">
+      <div class="value-icon vi1">❤️</div>
+      <div><div class="value-name">Forgiveness</div><div class="value-desc">The wound became the wisdom. Forgiveness means you choose to put the heavy stone down — for <em>you</em>.</div></div>
     </div>
-    <div class="value-card animate-slide delay-2">
-      <div class="value-num c2">✨</div>
-      <div class="value-content">
-        <div class="value-name">Amor Fati</div>
-        <div class="value-desc">Latin for "love your fate." Not giving up — actively loving what life gives you, even the hard parts. Every obstacle is secretly a door.</div>
-      </div>
+    <div class="value-card anim-slide d2">
+      <div class="value-icon vi2">✨</div>
+      <div><div class="value-name">Amor Fati</div><div class="value-desc">Latin for "love your fate." Actively loving what life gives you — even the hard parts. Every obstacle is secretly a door.</div></div>
     </div>
-    <div class="value-card animate-slide delay-3">
-      <div class="value-num c3">🔮</div>
-      <div class="value-content">
-        <div class="value-name">Synchronicity</div>
-        <div class="value-desc">Nothing arrives by accident. When things align — that's the universe sending a message. The timing is always telling you something.</div>
-      </div>
+    <div class="value-card anim-slide d3">
+      <div class="value-icon vi3">🔮</div>
+      <div><div class="value-name">Synchronicity</div><div class="value-desc">Nothing arrives by accident. When things align — that's a message. The timing is always telling you something.</div></div>
     </div>
-    <div class="value-card animate-slide delay-4">
-      <div class="value-num c4">💙</div>
-      <div class="value-content">
-        <div class="value-name">Kindness</div>
-        <div class="value-desc">A whole career built without ever being cruel — proof that being kind is not weakness. It is the <em>strongest</em> thing a person can be.</div>
-      </div>
+    <div class="value-card anim-slide d4">
+      <div class="value-icon vi4">💙</div>
+      <div><div class="value-name">Kindness</div><div class="value-desc">A whole career built without cruelty — proof that being kind is not weakness. It is the <em>strongest</em> thing.</div></div>
     </div>
-    <div class="value-card animate-slide delay-5">
-      <div class="value-num c5">🌳</div>
-      <div class="value-content">
-        <div class="value-name">Long-Term Thinking</div>
-        <div class="value-desc">The oak doesn't argue with winter. It roots deeper and waits. Spring always returns — every single time.</div>
-      </div>
+    <div class="value-card anim-slide d5">
+      <div class="value-icon vi5">🌳</div>
+      <div><div class="value-name">Long-Term Thinking</div><div class="value-desc">The oak doesn't argue with winter. It roots deeper and waits. Spring always returns — every single time.</div></div>
     </div>
-    <div class="value-card animate-slide delay-6">
-      <div class="value-num c6">🎵</div>
-      <div class="value-content">
-        <div class="value-name">Grace</div>
-        <div class="value-desc">What begins as conflict, time can transform into something beautiful. Music heals what words can't reach.</div>
-      </div>
+    <div class="value-card anim-slide d6">
+      <div class="value-icon vi6">🎵</div>
+      <div><div class="value-name">Grace</div><div class="value-desc">What begins as conflict, time can transform into beauty. Music heals what words can't reach.</div></div>
     </div>
   </div>
 
   <div class="quotes-section">
-    <div class="quotes-title animate-slide">📜 From the Stoics</div>
-    <div class="philosopher-card animate-slide delay-1">
-      <div class="phil-quote">"You have power over your mind — not outside events. Realise this, and you will find strength."</div>
-      <div class="phil-name">— Marcus Aurelius</div>
-    </div>
-    <div class="philosopher-card animate-slide delay-2">
-      <div class="phil-quote">"We suffer more in imagination than in reality."</div>
-      <div class="phil-name">— Seneca</div>
-    </div>
-    <div class="philosopher-card animate-slide delay-3">
-      <div class="phil-quote">"Make the best use of what is in your power, and take the rest as it happens."</div>
-      <div class="phil-name">— Epictetus</div>
-    </div>
-    <div class="philosopher-card animate-slide delay-4">
-      <div class="phil-quote">"The impediment to action advances action. What stands in the way becomes the way."</div>
-      <div class="phil-name">— Marcus Aurelius</div>
-    </div>
+    <div class="quotes-title anim-slide">📜 From the Stoics</div>
+    <div class="philosopher-card anim-slide d1"><div class="phil-quote">"You have power over your mind — not outside events. Realise this, and you will find strength."</div><div class="phil-name">— Marcus Aurelius</div></div>
+    <div class="philosopher-card anim-slide d2"><div class="phil-quote">"We suffer more in imagination than in reality."</div><div class="phil-name">— Seneca</div></div>
+    <div class="philosopher-card anim-slide d3"><div class="phil-quote">"Make the best use of what is in your power, and take the rest as it happens."</div><div class="phil-name">— Epictetus</div></div>
+    <div class="philosopher-card anim-slide d4"><div class="phil-quote">"The impediment to action advances action. What stands in the way becomes the way."</div><div class="phil-name">— Marcus Aurelius</div></div>
   </div>
-
-  <div style="height: 20px;"></div>
+  <div style="height:20px"></div>
 </div>
 
-<!-- ════════════════ BOTTOM NAV ════════════════ -->
-
+<!-- ══════════════════════════════════
+     BOTTOM NAV
+══════════════════════════════════ -->
 <nav class="bottom-nav">
-  <button class="nav-btn active" id="nav-home" onclick="goTo('screen-home')">
-    <span class="nav-icon">🏠</span>Home
-  </button>
-  <button class="nav-btn" id="nav-feel" onclick="goTo('screen-feel')">
-    <span class="nav-icon">💭</span>I Feel...
-  </button>
-  <button class="nav-btn" id="nav-wisdom" onclick="goTo('screen-wisdom')">
-    <span class="nav-icon">⭐</span>Wisdom
-  </button>
+  <button class="nav-btn active" id="nav-home"   onclick="goTo('screen-home')">  <span class="nav-icon">🏠</span>Home</button>
+  <button class="nav-btn"        id="nav-feel"   onclick="goTo('screen-feel')">  <span class="nav-icon">💭</span>I Feel...</button>
+  <button class="nav-btn"        id="nav-wisdom" onclick="goTo('screen-wisdom')"><span class="nav-icon">⭐</span>Wisdom</button>
 </nav>
 
 <script>
-// ── STAR GENERATOR ──
-const starEmojis = ['⭐','✨','🌟','💫','🌸','🍀'];
+/* ── STARS ── */
+const starEmojis = ['⭐','✨','🌟','💫','🌸','🍀','🌈'];
 const starsContainer = document.getElementById('starsContainer');
-for (let i = 0; i < 18; i++) {
-  const star = document.createElement('div');
-  star.className = 'star';
-  star.textContent = starEmojis[Math.floor(Math.random() * starEmojis.length)];
-  star.style.left = Math.random() * 100 + '%';
-  star.style.top  = Math.random() * 100 + '%';
-  star.style.fontSize = (0.8 + Math.random() * 1.0) + 'rem';
-  star.style.animationDelay = (Math.random() * 4) + 's';
-  star.style.animationDuration = (2.5 + Math.random() * 2) + 's';
-  starsContainer.appendChild(star);
+for (let i = 0; i < 16; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  s.textContent = starEmojis[Math.floor(Math.random() * starEmojis.length)];
+  s.style.cssText = `
+    left:${Math.random()*100}%;
+    top:${Math.random()*100}%;
+    font-size:${0.7 + Math.random()*0.9}rem;
+    animation-delay:${Math.random()*4}s;
+    animation-duration:${2.5+Math.random()*2}s;
+  `;
+  starsContainer.appendChild(s);
 }
 
-// ── NAVIGATION ──
-function goTo(screenId) {
+/* ── NAVIGATION ── */
+function goTo(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(screenId).classList.add('active');
+  document.getElementById(id).classList.add('active');
   window.scrollTo(0, 0);
-
-  // Update nav active state
+  const map = { 'screen-home':'nav-home', 'screen-feel':'nav-feel', 'screen-wisdom':'nav-wisdom' };
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  const map = { 'screen-home': 'nav-home', 'screen-feel': 'nav-feel', 'screen-wisdom': 'nav-wisdom' };
-  if (map[screenId]) document.getElementById(map[screenId]).classList.add('active');
+  if (map[id]) document.getElementById(map[id]).classList.add('active');
 }
 
-// ── RESPONSE DATA ──
+/* ── RESPONSE DATA ──
+   videoId: YouTube video ID to embed.
+   Set to null to show "Coming Soon" placeholder.
+   Replace with your own Czech YouTube video IDs when ready! 🎬
+   Example: videoId: 'dQw4w9WgXcQ'  ← paste your YouTube video ID here
+─────────────────────────────────── */
 const responses = {
   mean: {
-    emoji: '😤',
-    title: 'When Someone is Mean',
-    color: '#FF6B6B',
-    body: `When someone says or does something cruel to you, it really hurts. That pain is real and valid. But here's a secret the Stoics discovered 2,000 years ago: <strong>you cannot control what others do — only how you respond.</strong><br><br>Their cruelty says everything about <em>them</em>, and nothing about your worth.`,
+    emoji: '😤', title: 'When Someone is Mean',
+    body: `When someone says or does something cruel to you, it really hurts. That pain is real. But here's a secret the Stoics discovered 2,000 years ago: <strong>you cannot control what others do — only how you respond.</strong><br><br>Their cruelty says everything about <em>them</em>, and nothing about your worth.`,
     pill: 'Stoic Principle: Acceptance',
     quote: '"You have power over your mind — not outside events. Realise this, and you will find strength."',
     philosopher: 'Marcus Aurelius',
     practice: [
       'Take 3 deep breaths. Let the first wave of anger pass.',
-      'Write down exactly what happened and how it made you feel.',
-      'Ask: "Can I control this person\'s behaviour?" (No!) "Can I control my reaction?" (Yes!)',
+      'Write down what happened and how it made you feel.',
+      'Ask: "Can I control this person\'s behaviour?" (No.) "Can I control my reaction?" (Yes!)',
       'Tell a trusted adult — you don\'t have to carry this alone.'
-    ]
+    ],
+    videoId: null, /* ← Replace with your Czech bullying video ID */
+    videoTitle: '🎬 The Wisdom Project — Bullying',
+    videoNote: 'Czech wisdom video about dealing with people who are mean — coming soon!'
   },
   scared: {
-    emoji: '😨',
-    title: 'When You Feel Scared',
-    color: '#FF9F43',
-    body: `Fear about the future is one of the most common feelings in the world. Even adults feel it — every single day. Seneca, one of the greatest Stoics, had a powerful idea: <strong>we suffer far more in imagination than in reality.</strong><br><br>Your brain is trying to protect you. But it often makes things bigger than they are.`,
+    emoji: '😨', title: 'When You Feel Scared',
+    body: `Fear about the future is one of the most common feelings in the world. Even adults feel it every day. Seneca knew: <strong>we suffer far more in imagination than in reality.</strong><br><br>Your brain is trying to protect you. But it often makes things much bigger than they really are.`,
     pill: 'Stoic Principle: Logos',
     quote: '"We suffer more in imagination than in reality."',
     philosopher: 'Seneca',
@@ -738,74 +593,79 @@ const responses = {
       'Write down your fear in one clear sentence.',
       'Ask: "What is the worst that could actually happen?"',
       'Ask: "If that happened, could I survive it?" (Almost always: yes.)',
-      'Focus only on what you can do TODAY — one small step.'
-    ]
+      'Focus only on what you can do TODAY — one small step forward.'
+    ],
+    videoId: null, /* ← Replace with your Czech fear/anxiety video ID */
+    videoTitle: '🎬 The Wisdom Project — Fear',
+    videoNote: 'Czech wisdom video about fear and the future — coming soon!'
   },
   regret: {
-    emoji: '😔',
-    title: 'When You Regret Something',
-    color: '#C77DFF',
-    body: `Regret means you care — and caring is a sign of good character. The Stoics believed in something called <strong>Amor Fati</strong>: love your fate. That includes your mistakes. They are not failures. They are your greatest teachers.<br><br>What matters now is not what you did — it's what you choose to do next.`,
+    emoji: '😔', title: 'When You Regret Something',
+    body: `Regret means you care — and caring is a sign of good character. The Stoics believed in <strong>Amor Fati</strong>: love your fate, including your mistakes. They are not failures. They are your greatest teachers.<br><br>What matters now is not what you did — it's what you choose to do next.`,
     pill: 'Stoic Principle: Amor Fati',
     quote: '"Make the best use of what is in your power, and take the rest as it happens."',
     philosopher: 'Epictetus',
     practice: [
       'Acknowledge honestly: "I made a mistake. That\'s human."',
-      'If you hurt someone — apologise. A simple, sincere sorry is brave.',
+      'If you hurt someone — apologise. A simple sincere sorry is brave.',
       'Ask: "What did this teach me?" Write the lesson down.',
       'Then: let it go. You cannot change the past. You can change today.'
-    ]
+    ],
+    videoId: null,
+    videoTitle: '🎬 The Wisdom Project — Regret',
+    videoNote: 'Czech wisdom video about mistakes and forgiveness of self — coming soon!'
   },
   family: {
-    emoji: '🏠',
-    title: 'When Family Feels Hard',
-    color: '#06D6A0',
-    body: `Fighting with people you love is one of the most confusing feelings there is. You can be furious at someone <em>and</em> love them at the same time. That's not strange — that's family.<br><br>The Stoics believed in something called <strong>Justice</strong>: treating every person with respect, even in conflict. Especially in conflict.`,
+    emoji: '🏠', title: 'When Family Feels Hard',
+    body: `Fighting with people you love is one of the most confusing feelings there is. You can be furious at someone <em>and</em> love them at the same time. That's not strange — that's family.<br><br>The Stoics believed in <strong>Justice</strong>: treating every person with respect, even in conflict. Especially in conflict.`,
     pill: 'Stoic Principle: Justice',
     quote: '"Waste no more time arguing about what a good person should be. Be one."',
     philosopher: 'Marcus Aurelius',
     practice: [
-      'Before speaking: take 5 breaths. Seriously — it works.',
+      'Before speaking: take 5 breaths. Seriously — it works every time.',
       'Try to say what YOU feel, not what THEY did wrong.',
       'Ask: "What does this person need right now?" — not just you.',
       'Remember: the argument will pass. The relationship lasts.'
-    ]
+    ],
+    videoId: null,
+    videoTitle: '🎬 The Wisdom Project — Family',
+    videoNote: 'Czech wisdom video about family conflict — coming soon!'
   },
   alone: {
-    emoji: '🌧️',
-    title: 'When You Feel Left Out',
-    color: '#4CC9F0',
-    body: `Feeling invisible or left out is one of the most painful feelings a human can have. You are not imagining it — it is real and it matters. But here is something true: <strong>you are never as alone as you feel in that moment.</strong><br><br>The Stoics remind us: your worth is not decided by who includes you. It was never up to them.`,
+    emoji: '🌧️', title: 'When You Feel Left Out',
+    body: `Feeling invisible or left out is one of the most painful feelings a human can have. You are not imagining it — it is real and it matters.<br><br>But here is something true: <strong>you are never as alone as you feel in that moment.</strong> Your worth was never up to them.`,
     pill: 'Stoic Principle: Inner Citadel',
     quote: '"Never depend on the admiration of others. There is no strength in it."',
     philosopher: 'Epictetus',
     practice: [
       'Write down 3 things that make you uniquely, wonderfully you.',
-      'Reach out to ONE person — a message, a call, anything.',
+      'Reach out to ONE person — a message, a call, anything small.',
       'Do one thing today that YOU love, just for yourself.',
       'Remember: belonging comes from being yourself — not performing for others.'
-    ]
+    ],
+    videoId: null,
+    videoTitle: '🎬 The Wisdom Project — Loneliness',
+    videoNote: 'Czech wisdom video about feeling alone and belonging — coming soon!'
   },
   angry: {
-    emoji: '🔥',
-    title: 'When You Feel Really Angry',
-    color: '#FF6B6B',
-    body: `Anger is not a problem. Anger is a messenger. It tells you something matters to you, something feels unfair, something needs to change. The Stoics didn't say "don't be angry." They said: <strong>pause before you act on it.</strong><br><br>The pause is where your power lives.`,
+    emoji: '🔥', title: 'When You Feel Really Angry',
+    body: `Anger is not a problem. Anger is a messenger. It tells you something matters to you, something feels unfair, something needs to change.<br><br>The Stoics didn't say "don't be angry." They said: <strong>pause before you act on it.</strong> The pause is where your power lives.`,
     pill: 'Stoic Principle: Temperance',
     quote: '"The best revenge is to be unlike him who performed the injustice."',
     philosopher: 'Marcus Aurelius',
     practice: [
       'STOP. Do not say or type anything for 60 seconds.',
       'Go somewhere physical — walk, run, move your body.',
-      'Ask: "Is this anger about THIS moment — or about something older?"',
+      'Ask: "Is this anger about THIS moment — or something older?"',
       'When calm: express what you need. Anger heard is anger healed.'
-    ]
+    ],
+    videoId: null,
+    videoTitle: '🎬 The Wisdom Project — Anger',
+    videoNote: 'Czech wisdom video about anger and what to do with it — coming soon!'
   },
   forgive: {
-    emoji: '🕊️',
-    title: 'When You Need to Forgive',
-    color: '#FF85A1',
-    body: `Forgiveness is one of the hardest — and most powerful — things a human being can do. Here is what the Stoics knew, and what experience confirms: <strong>forgiveness is not a gift to the person who hurt you. It is a gift to yourself.</strong><br><br>Carrying anger is like holding a hot coal. Forgiveness means putting it down.`,
+    emoji: '🕊️', title: 'When You Need to Forgive',
+    body: `Forgiveness is one of the hardest — and most powerful — things a human being can do. Here is what the Stoics knew: <strong>forgiveness is not a gift to the person who hurt you. It is a gift to yourself.</strong><br><br>Carrying anger is like holding a hot coal. Forgiveness means putting it down.`,
     pill: 'Stoic Principle: Forgiveness',
     quote: '"How much more grievous are the consequences of anger than the causes of it."',
     philosopher: 'Marcus Aurelius',
@@ -814,56 +674,91 @@ const responses = {
       'Ask: "What would it feel like to put this down?"',
       'Forgiveness does not mean trusting them again — it means freeing you.',
       'Write a letter you never send. Say everything. Then let it go.'
-    ]
+    ],
+    videoId: null,
+    videoTitle: '🎬 The Wisdom Project — Forgiveness',
+    videoNote: 'Czech wisdom video about the power of forgiveness — coming soon!'
   },
   lost: {
-    emoji: '🌱',
-    title: 'When You Feel Lost',
-    color: '#C77DFF',
-    body: `Feeling lost — not knowing who you are or where you belong — is not a sign that something is wrong with you. It is a sign that you are <em>growing</em>. The Stoics believed that the purpose of a human life is to become more and more <strong>yourself</strong>.<br><br>You are not lost. You are becoming.`,
+    emoji: '🌱', title: 'When You Feel Lost',
+    body: `Feeling lost — not knowing who you are or where you belong — is not a sign something is wrong with you. It is a sign that you are <em>growing</em>.<br><br>The Stoics believed the purpose of a human life is to become more and more <strong>yourself</strong>. You are not lost. You are becoming.`,
     pill: 'Stoic Principle: Eudaimonia',
     quote: '"He who knows others is wise; he who knows himself is enlightened."',
     philosopher: 'Lao Tzu',
     practice: [
       'Write: "The things I love most in the world are..." — don\'t stop for 3 minutes.',
-      'Ask: "When do I feel most like ME?" That is your compass.',
+      'Ask: "When do I feel most like ME?" That feeling is your compass.',
       'Being lost is the beginning of finding yourself. Trust the process.',
-      'Talk to someone you admire. Ask them when they figured themselves out. (Spoiler: still working on it! 😄)'
-    ]
+      'Talk to someone you admire. Ask when they figured themselves out. (Spoiler: still working on it 😄)'
+    ],
+    videoId: null,
+    videoTitle: '🎬 The Wisdom Project — Who Am I?',
+    videoNote: 'Czech wisdom video about identity and finding yourself — coming soon!'
   }
 };
+
+function buildVideoSection(r) {
+  if (r.videoId) {
+    /* Real YouTube embed */
+    return `
+      <div class="video-section anim-slide d1">
+        <div class="video-label"><span>📺</span>${r.videoTitle}</div>
+        <div class="video-wrapper">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/${r.videoId}?rel=0&modestbranding=1&playsinline=1"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            loading="lazy">
+          </iframe>
+        </div>
+      </div>`;
+  } else {
+    /* Coming soon placeholder */
+    return `
+      <div class="video-section anim-slide d1">
+        <div class="video-label"><span>📺</span>${r.videoTitle}</div>
+        <div class="video-wrapper">
+          <div class="video-coming-soon">
+            <div class="cs-icon">🎬</div>
+            <h4>Video Coming Soon!</h4>
+            <p>${r.videoNote}</p>
+            <div class="video-channel-badge">✨ The Wisdom Project — Czech Channel</div>
+          </div>
+        </div>
+      </div>`;
+  }
+}
 
 function showResponse(key) {
   const r = responses[key];
   const html = `
-    <div class="response-hero animate-pop">
-      <span class="response-emoji pulse">${r.emoji}</span>
+    <div class="response-hero anim-pop">
+      <span class="response-emoji">${r.emoji}</span>
       <h2 class="response-title">${r.title}</h2>
       <p class="response-body">${r.body}</p>
       <span class="wisdom-pill">${r.pill}</span>
     </div>
-    <div class="stoic-box animate-slide delay-1">
+    ${buildVideoSection(r)}
+    <div class="stoic-box anim-slide d2">
       <div class="stoic-label">📜 Stoic Wisdom</div>
       <div class="stoic-quote">${r.quote}</div>
       <div class="stoic-by">— ${r.philosopher}</div>
     </div>
-    <div class="practice-box animate-slide delay-2">
+    <div class="practice-box anim-slide d3">
       <div class="practice-label">✅ Try This — Right Now</div>
       <ul class="practice-steps">
         ${r.practice.map((step, i) => `<li><span class="step-num">${i+1}</span>${step}</li>`).join('')}
       </ul>
     </div>
-    <div class="you-are-not-alone animate-slide delay-3">
+    <div class="you-are-not-alone anim-slide d4">
       <span>💛</span>
       You are NOT alone with this feeling.<br>
       Every human being has felt exactly this way.<br>
       <strong>That's why wisdom exists — for moments like this one.</strong>
-    </div>
-  `;
+    </div>`;
   document.getElementById('response-content').innerHTML = html;
   goTo('screen-response');
 }
 </script>
-
 </body>
 </html>
