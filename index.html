@@ -1,363 +1,869 @@
 <!DOCTYPE html>
-<html lang="en">
+
+<html lang="cs">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Wisdom">
-<meta name="theme-color" content="#0f1f14">
-<title>The Wisdom Project</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Cinzel:wght@600&family=Cormorant+Garamond:ital,wght@0,400;1,300;1,400&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>The Wisdom Project 🌟</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --bg:#0f1f14;
-  --bg2:#162b1c;
-  --bg3:#1d3824;
-  --g1:#5ddb6e;
-  --g2:#3a9e4e;
-  --g3:#27703a;
-  --gold:#f0c060;
-  --goldd:#c09030;
-  --red:#ff6b6b;
-  --blue:#60b4ff;
-  --purple:#b06bff;
-  --orange:#ff9f40;
-  --teal:#40ddc8;
-  --yellow:#ffd060;
-  --t1:#f0faf2;
-  --t2:rgba(230,250,235,0.9);
-  --t3:rgba(190,230,200,0.65);
-  --t4:rgba(160,210,175,0.42);
-  --border:rgba(90,200,110,0.14);
-  --safe:env(safe-area-inset-bottom,0px);
+  :root {
+    --sky: #E8F4FD;
+    --sun: #FFD166;
+    --coral: #FF6B6B;
+    --mint: #06D6A0;
+    --lavender: #C77DFF;
+    --peach: #FF9F43;
+    --sky-blue: #4CC9F0;
+    --soft-pink: #FF85A1;
+    --warm-white: #FFFDF7;
+    --card-shadow: 0 8px 32px rgba(0,0,0,0.10);
+    --bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+- { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+font-family: ‘Nunito’, sans-serif;
+background: var(–warm-white);
+min-height: 100vh;
+overflow-x: hidden;
+color: #3A3A5C;
 }
-html,body{
-  width:100%;height:100%;overflow:hidden;
-  background:var(--bg);
-  font-family:'Nunito',sans-serif;
-  color:var(--t1);
-  -webkit-tap-highlight-color:transparent;
-  user-select:none;
+
+/* ── BACKGROUND BLOBS ── */
+.bg-canvas {
+position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
 }
-.app{width:100%;height:100vh;position:relative;overflow:hidden;display:flex;flex-direction:column;}
-.screen{
-  position:absolute;inset:0;bottom:calc(68px + var(--safe));
-  display:flex;flex-direction:column;
-  opacity:0;pointer-events:none;
-  transition:opacity .28s ease,transform .28s ease;
-  transform:translateX(24px);
+.blob {
+position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.35;
+animation: blobFloat 8s ease-in-out infinite alternate;
 }
-.screen.active{opacity:1;pointer-events:all;transform:translateX(0);}
-.screen.exit{opacity:0;transform:translateX(-24px);}
-.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:24px;}
-.scroll::-webkit-scrollbar{display:none;}
-.nav{
-  position:fixed;bottom:0;left:0;right:0;
-  height:calc(68px + var(--safe));
-  padding-bottom:var(--safe);
-  background:rgba(12,22,16,0.97);
-  backdrop-filter:blur(20px);
-  border-top:1px solid var(--border);
-  display:flex;z-index:200;
+.blob-1 { width: 400px; height: 400px; background: var(–sun);    top: -100px; left: -100px; animation-delay: 0s; }
+.blob-2 { width: 350px; height: 350px; background: var(–soft-pink); top: 30%; right: -80px; animation-delay: 2s; }
+.blob-3 { width: 300px; height: 300px; background: var(–mint);   bottom: 10%; left: 5%;   animation-delay: 4s; }
+.blob-4 { width: 250px; height: 250px; background: var(–sky-blue); bottom: -60px; right: 10%; animation-delay: 1s; }
+
+@keyframes blobFloat {
+from { transform: translate(0, 0) scale(1); }
+to   { transform: translate(30px, 20px) scale(1.08); }
 }
-.nb{
-  flex:1;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:3px;
-  background:none;border:none;cursor:pointer;
-  color:var(--t4);transition:all .2s;padding:0;
+
+/* ── FLOATING STARS ── */
+.stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.star {
+position: absolute;
+font-size: 1.2rem;
+animation: starTwinkle 3s ease-in-out infinite alternate;
+opacity: 0.7;
 }
-.nb.on{color:var(--g1);}
-.nb-icon{font-size:22px;line-height:1;}
-.nb-label{font-size:9px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;}
-.tbar{
-  height:52px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 20px;
-  border-bottom:1px solid var(--border);
-  background:rgba(12,22,16,0.95);
-  backdrop-filter:blur(12px);
-  z-index:50;
+@keyframes starTwinkle {
+from { transform: scale(1) rotate(0deg); opacity: 0.5; }
+to   { transform: scale(1.4) rotate(20deg); opacity: 1; }
 }
-.tbar-title{font-size:16px;font-weight:800;color:var(--t1);}
-.tbar-back{
-  display:flex;align-items:center;gap:4px;
-  font-size:14px;font-weight:700;
-  color:var(--g1);background:none;border:none;cursor:pointer;padding:8px 0;
+
+/* ── LAYOUT ── */
+.screen {
+position: relative; z-index: 1;
+min-height: 100vh;
+display: none;
+flex-direction: column;
+padding: 0 0 100px 0;
 }
-.home-hero{
-  position:relative;overflow:hidden;
-  padding:28px 24px 24px;
-  background:linear-gradient(180deg,rgba(20,55,28,0.95) 0%,rgba(15,31,20,0) 100%);
-  display:flex;flex-direction:column;align-items:center;text-align:center;
+.screen.active { display: flex; }
+
+/* ── TOP HEADER ── */
+.top-header {
+text-align: center;
+padding: 36px 24px 20px;
 }
-.rings{position:absolute;top:50%;left:50%;transform:translate(-50%,-54%);width:260px;height:260px;pointer-events:none;}
-.ring{position:absolute;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);animation:rpulse 4s ease-in-out infinite;}
-.ring:nth-child(1){width:70px;height:70px;border:1.5px solid rgba(93,219,110,0.18);animation-delay:0s;}
-.ring:nth-child(2){width:130px;height:130px;border:1px solid rgba(93,219,110,0.1);animation-delay:.7s;}
-.ring:nth-child(3){width:200px;height:200px;border:1px solid rgba(93,219,110,0.06);animation-delay:1.4s;}
-@keyframes rpulse{0%,100%{opacity:.6;transform:translate(-50%,-50%) scale(1);}50%{opacity:1;transform:translate(-50%,-50%) scale(1.04);}}
-.tree{width:68px;height:68px;margin-bottom:12px;position:relative;z-index:2;animation:breathe 5s ease-in-out infinite;}
-@keyframes breathe{0%,100%{transform:scale(1);opacity:.88;}50%{transform:scale(1.06);opacity:1;}}
-.tree svg{width:100%;height:100%;}
-.hero-tag{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--g1);margin-bottom:6px;position:relative;z-index:2;background:rgba(93,219,110,0.1);border:1px solid rgba(93,219,110,0.2);border-radius:20px;padding:4px 14px;}
-.hero-title{font-family:'Nunito',sans-serif;font-size:36px;font-weight:900;color:var(--t1);line-height:1.1;margin-bottom:6px;position:relative;z-index:2;text-shadow:0 2px 20px rgba(93,219,110,0.15);}
-.hero-title span{color:var(--g1);}
-.hero-sub{font-size:15px;font-weight:600;color:var(--t3);line-height:1.6;margin-bottom:20px;position:relative;z-index:2;}
-.hero-quote-box{width:100%;background:rgba(93,219,110,0.07);border:1px solid rgba(93,219,110,0.18);border-left:3px solid var(--g1);border-radius:0 12px 12px 0;padding:14px 18px;text-align:left;position:relative;z-index:2;}
-.hero-quote{font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;font-weight:400;color:var(--t2);line-height:1.8;margin-bottom:5px;}
-.hero-attr{font-size:11px;font-weight:700;color:var(--g1);letter-spacing:1px;}
-.mission{margin:16px 16px 0;background:linear-gradient(135deg,rgba(93,219,110,0.1),rgba(58,158,78,0.05));border:1px solid rgba(93,219,110,0.2);border-radius:20px;padding:20px 20px;text-align:center;}
-.mission-tag{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
-.mission-text{font-size:16px;font-weight:600;color:var(--t2);line-height:1.7;}
-.mission-text em{color:var(--g1);font-style:normal;}
-.h-cards{padding:16px;display:flex;flex-direction:column;gap:12px;}
-.h-label{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--t4);margin-bottom:2px;}
-.h-card{border-radius:18px;padding:18px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;border:1.5px solid rgba(255,255,255,0.08);}
-.h-card:active{transform:scale(.98);}
-.h-card-emoji{font-size:36px;flex-shrink:0;}
-.h-card-body{flex:1;}
-.h-card-title{font-size:17px;font-weight:800;margin-bottom:3px;}
-.h-card-sub{font-size:13px;font-weight:600;opacity:.7;line-height:1.4;}
-.h-card-arrow{font-size:22px;opacity:.5;}
-.feel-intro{padding:20px 20px 14px;background:linear-gradient(180deg,rgba(20,55,28,0.5) 0%,transparent 100%);}
-.feel-big{font-size:28px;font-weight:900;color:var(--t1);margin-bottom:4px;}
-.feel-sub{font-size:15px;font-weight:600;color:var(--t3);line-height:1.5;}
-.feel-grid{padding:8px 14px;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.fc{border-radius:20px;padding:20px 14px 16px;cursor:pointer;transition:all .22s;text-align:center;position:relative;overflow:hidden;border:1.5px solid rgba(255,255,255,0.07);}
-.fc:active{transform:scale(.95);}
-.fc-emoji{font-size:40px;margin-bottom:10px;display:block;}
-.fc-label{font-size:13px;font-weight:800;color:var(--t1);line-height:1.4;}
-.fc-sub{font-size:11px;font-weight:600;color:rgba(255,255,255,0.5);margin-top:3px;line-height:1.3;}
-.fd-top{padding:24px 20px 18px;text-align:center;background:linear-gradient(180deg,rgba(20,55,28,0.5) 0%,transparent 100%);}
-.fd-emoji{font-size:60px;margin-bottom:8px;display:block;}
-.fd-title{font-size:24px;font-weight:900;color:var(--t1);}
-.fd-body{padding:0 14px;display:flex;flex-direction:column;gap:12px;}
-.dc{border-radius:18px;padding:18px;position:relative;overflow:hidden;}
-.dc-tag{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;padding:3px 10px;border-radius:12px;display:inline-block;}
-.dc-quote{font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;font-weight:400;color:var(--t2);line-height:1.8;margin-bottom:6px;}
-.dc-attr{font-size:11px;font-weight:700;letter-spacing:1px;}
-.dc-text{font-size:15px;font-weight:600;color:var(--t2);line-height:1.75;}
-.dc-practice{font-size:14px;font-weight:600;color:var(--t3);line-height:1.7;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.08);}
-.dc-practice strong{color:var(--t1);font-weight:800;}
-.illus-card{border-radius:18px;overflow:hidden;background:var(--bg2);border:1.5px solid var(--border);}
-.illus-tag-bar{padding:12px 16px 6px;font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--gold);}
-.illus-inner{padding:8px 16px 0;display:flex;justify-content:center;}
-.illus-inner svg{max-width:100%;height:auto;}
-.illus-cap{padding:8px 16px 14px;text-align:center;font-size:13px;font-weight:700;color:var(--t3);line-height:1.5;font-style:italic;}
-.vid-card{border-radius:18px;overflow:hidden;background:var(--bg2);border:1.5px solid var(--border);}
-.vid-tag-bar{padding:14px 16px 8px;font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--gold);}
-.vid-thumb{margin:0 14px;border-radius:14px;overflow:hidden;background:var(--bg3);border:1px solid var(--border);position:relative;cursor:pointer;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;transition:all .2s;}
-.vid-thumb:active{transform:scale(.98);}
-.vid-bg{position:absolute;inset:0;background:linear-gradient(135deg,rgba(18,50,28,0.95),rgba(10,20,14,0.98));}
-.vid-play{position:relative;z-index:2;width:56px;height:56px;border-radius:50%;background:rgba(93,219,110,0.2);border:2px solid var(--g1);display:flex;align-items:center;justify-content:center;transition:all .2s;}
-.vid-thumb:active .vid-play{background:rgba(93,219,110,0.4);transform:scale(1.1);}
-.vid-play svg{width:24px;height:24px;color:var(--g1);margin-left:3px;}
-.vid-coming-txt{position:relative;z-index:2;text-align:center;font-size:14px;font-weight:700;color:rgba(200,230,210,0.6);line-height:1.7;padding:24px;}
-.vid-info{padding:10px 16px 14px;}
-.vid-ttl{font-size:15px;font-weight:800;color:var(--t1);margin-bottom:3px;}
-.vid-meta{font-size:11px;font-weight:600;color:var(--t4);}
-.wis-intro{padding:22px 20px 16px;background:linear-gradient(180deg,rgba(20,55,28,0.5) 0%,transparent 100%);}
-.wis-big{font-size:30px;font-weight:900;color:var(--t1);margin-bottom:4px;}
-.wis-sub{font-size:14px;font-weight:600;color:var(--t3);line-height:1.5;}
-.val-list{padding:10px 14px;display:flex;flex-direction:column;gap:10px;}
-.vc{border-radius:18px;padding:18px 18px 16px;position:relative;overflow:hidden;border:1.5px solid rgba(255,255,255,0.06);cursor:pointer;transition:all .2s;}
-.vc:active{transform:scale(.99);}
-.vc-stripe{position:absolute;top:0;left:0;bottom:0;width:4px;border-radius:4px 0 0 4px;}
-.vc-head{display:flex;align-items:center;gap:10px;margin-bottom:7px;}
-.vc-num{font-size:9px;font-weight:800;letter-spacing:2px;background:rgba(255,255,255,0.07);border-radius:8px;padding:3px 8px;color:var(--t3);}
-.vc-title{font-size:17px;font-weight:900;color:var(--t1);}
-.vc-desc{font-size:14px;font-weight:600;color:var(--t3);line-height:1.65;}
-.sq-section{padding:8px 14px 4px;}
-.sq-label{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--t4);margin-bottom:10px;}
-.sq-list{display:flex;flex-direction:column;gap:10px;}
-.sq{background:linear-gradient(135deg,rgba(25,65,35,0.6),rgba(15,30,20,0.7));border:1.5px solid rgba(93,219,110,0.12);border-radius:18px;padding:18px;position:relative;overflow:hidden;}
-.sq-text{font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;color:var(--t2);line-height:1.75;margin-bottom:8px;}
-.sq-attr{font-size:11px;font-weight:800;letter-spacing:1.5px;color:var(--gold);}
+
+.logo-badge {
+display: inline-flex;
+align-items: center;
+gap: 10px;
+background: white;
+border-radius: 50px;
+padding: 10px 22px;
+box-shadow: 0 4px 20px rgba(0,0,0,0.10);
+margin-bottom: 20px;
+font-size: 0.85rem;
+font-weight: 700;
+color: #7C6F8E;
+letter-spacing: 1.5px;
+text-transform: uppercase;
+}
+
+.main-title {
+font-family: ‘Fredoka One’, cursive;
+font-size: clamp(2.8rem, 8vw, 4.5rem);
+line-height: 1.05;
+background: linear-gradient(135deg, #FF6B6B 0%, #FF9F43 40%, #FFD166 100%);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+margin-bottom: 12px;
+}
+
+.main-subtitle {
+font-size: 1.1rem;
+font-weight: 600;
+color: #7C6F8E;
+max-width: 320px;
+margin: 0 auto 24px;
+line-height: 1.5;
+}
+
+/* ── QUOTE CARD ── */
+.quote-card {
+background: white;
+border-radius: 24px;
+padding: 24px 28px;
+margin: 0 20px 28px;
+box-shadow: var(–card-shadow);
+position: relative;
+overflow: hidden;
+text-align: center;
+border: 3px solid var(–sun);
+}
+.quote-card::before {
+content: ‘💬’;
+font-size: 2.5rem;
+display: block;
+margin-bottom: 10px;
+}
+.quote-text {
+font-size: 1.05rem;
+font-weight: 700;
+color: #3A3A5C;
+line-height: 1.5;
+font-style: italic;
+}
+.quote-author {
+font-size: 0.85rem;
+font-weight: 800;
+color: var(–coral);
+margin-top: 10px;
+text-transform: uppercase;
+letter-spacing: 1px;
+}
+
+/* ── BIG ACTION BUTTON ── */
+.big-btn {
+display: block;
+margin: 0 24px 16px;
+padding: 20px 28px;
+border-radius: 20px;
+border: none;
+cursor: pointer;
+text-align: center;
+text-decoration: none;
+font-family: ‘Nunito’, sans-serif;
+font-weight: 800;
+font-size: 1.15rem;
+transition: transform 0.2s var(–bounce), box-shadow 0.2s ease;
+position: relative;
+overflow: hidden;
+}
+.big-btn:active { transform: scale(0.96) !important; }
+.big-btn:hover  { transform: translateY(-3px) scale(1.02); }
+
+.btn-feel {
+background: linear-gradient(135deg, var(–coral), var(–peach));
+color: white;
+box-shadow: 0 8px 24px rgba(255, 107, 107, 0.40);
+}
+.btn-wisdom {
+background: linear-gradient(135deg, var(–lavender), var(–sky-blue));
+color: white;
+box-shadow: 0 8px 24px rgba(199, 125, 255, 0.40);
+}
+.btn-soon {
+background: linear-gradient(135deg, var(–mint), #00C896);
+color: white;
+box-shadow: 0 8px 24px rgba(6, 214, 160, 0.35);
+opacity: 0.75;
+}
+
+.big-btn .btn-icon { font-size: 1.8rem; display: block; margin-bottom: 4px; }
+.big-btn .btn-label { display: block; font-size: 1.2rem; }
+.big-btn .btn-desc  { display: block; font-size: 0.82rem; font-weight: 600; opacity: 0.85; margin-top: 2px; }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+position: fixed;
+bottom: 0; left: 0; right: 0;
+background: white;
+display: flex;
+justify-content: space-around;
+align-items: center;
+padding: 10px 0 16px;
+box-shadow: 0 -4px 24px rgba(0,0,0,0.10);
+z-index: 100;
+border-top: 3px solid #F0EEF8;
+}
+.nav-btn {
+display: flex; flex-direction: column; align-items: center; gap: 3px;
+background: none; border: none; cursor: pointer;
+font-family: ‘Nunito’, sans-serif;
+font-weight: 700; font-size: 0.72rem; color: #AAA0BF;
+transition: all 0.2s var(–bounce);
+padding: 4px 16px;
+border-radius: 16px;
+}
+.nav-btn.active { color: var(–coral); }
+.nav-btn.active .nav-icon { transform: scale(1.25); }
+.nav-icon { font-size: 1.6rem; transition: transform 0.2s var(–bounce); }
+
+/* ── FEELINGS SCREEN ── */
+.screen-title {
+font-family: ‘Fredoka One’, cursive;
+font-size: 2rem;
+text-align: center;
+margin: 28px 24px 8px;
+}
+.screen-sub {
+text-align: center;
+font-weight: 600;
+color: #7C6F8E;
+font-size: 0.95rem;
+margin: 0 24px 20px;
+line-height: 1.5;
+}
+
+.feelings-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 14px;
+padding: 0 18px;
+}
+
+.feeling-card {
+background: white;
+border-radius: 20px;
+padding: 18px 14px;
+text-align: center;
+cursor: pointer;
+border: 3px solid transparent;
+box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+transition: all 0.25s var(–bounce);
+font-family: ‘Nunito’, sans-serif;
+}
+.feeling-card:active { transform: scale(0.94); }
+.feeling-card:hover  { transform: translateY(-4px); box-shadow: 0 10px 28px rgba(0,0,0,0.14); }
+
+.feeling-card[data-color=“coral”]    { border-color: var(–coral);    }
+.feeling-card[data-color=“peach”]    { border-color: var(–peach);    }
+.feeling-card[data-color=“lavender”] { border-color: var(–lavender); }
+.feeling-card[data-color=“mint”]     { border-color: var(–mint);     }
+.feeling-card[data-color=“sky”]      { border-color: var(–sky-blue); }
+.feeling-card[data-color=“pink”]     { border-color: var(–soft-pink);}
+
+.feeling-emoji { font-size: 2.4rem; display: block; margin-bottom: 8px; }
+.feeling-title { font-weight: 800; font-size: 0.9rem; color: #3A3A5C; margin-bottom: 4px; }
+.feeling-desc  { font-weight: 600; font-size: 0.73rem; color: #9990B0; line-height: 1.35; }
+
+/* ── RESPONSE SCREEN ── */
+.back-btn {
+display: inline-flex; align-items: center; gap: 8px;
+background: white; border: none; cursor: pointer;
+font-family: ‘Nunito’, sans-serif;
+font-weight: 700; font-size: 1rem; color: #7C6F8E;
+padding: 12px 20px; margin: 20px;
+border-radius: 50px;
+box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+transition: all 0.2s var(–bounce);
+}
+.back-btn:hover { transform: translateX(-3px); }
+
+.response-hero {
+background: white;
+border-radius: 28px;
+margin: 0 18px 20px;
+padding: 28px 24px;
+box-shadow: var(–card-shadow);
+text-align: center;
+}
+.response-emoji { font-size: 4rem; margin-bottom: 12px; display: block; }
+.response-title {
+font-family: ‘Fredoka One’, cursive;
+font-size: 1.7rem;
+margin-bottom: 10px;
+color: #3A3A5C;
+}
+.response-body {
+font-size: 1rem;
+font-weight: 600;
+color: #5A5270;
+line-height: 1.65;
+}
+
+.wisdom-pill {
+display: inline-block;
+background: linear-gradient(135deg, var(–sun), var(–peach));
+color: white;
+font-weight: 800;
+font-size: 0.78rem;
+padding: 5px 14px;
+border-radius: 50px;
+margin: 12px 0 0;
+text-transform: uppercase;
+letter-spacing: 0.8px;
+}
+
+.stoic-box {
+background: linear-gradient(135deg, #F8F0FF, #E8F4FD);
+border-radius: 20px;
+padding: 20px 22px;
+margin: 0 18px 16px;
+border-left: 5px solid var(–lavender);
+}
+.stoic-label {
+font-size: 0.75rem; font-weight: 800; color: var(–lavender);
+text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;
+}
+.stoic-quote { font-size: 1rem; font-weight: 700; color: #3A3A5C; line-height: 1.5; font-style: italic; }
+.stoic-by    { font-size: 0.82rem; font-weight: 700; color: var(–lavender); margin-top: 6px; }
+
+.practice-box {
+background: white;
+border-radius: 20px;
+padding: 20px 22px;
+margin: 0 18px 16px;
+box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+border-top: 4px solid var(–mint);
+}
+.practice-label {
+font-size: 0.75rem; font-weight: 800; color: var(–mint);
+text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;
+}
+.practice-steps { list-style: none; }
+.practice-steps li {
+padding: 7px 0; font-weight: 600; font-size: 0.95rem; color: #5A5270;
+display: flex; gap: 10px; align-items: flex-start;
+border-bottom: 1px solid #F0EEF8;
+}
+.practice-steps li:last-child { border-bottom: none; }
+.step-num {
+background: var(–mint); color: white; font-weight: 800;
+width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+display: flex; align-items: center; justify-content: center; font-size: 0.78rem;
+}
+
+.you-are-not-alone {
+background: linear-gradient(135deg, var(–coral), var(–soft-pink));
+color: white;
+border-radius: 20px;
+margin: 0 18px 16px;
+padding: 20px 24px;
+text-align: center;
+font-weight: 800;
+font-size: 1.1rem;
+line-height: 1.5;
+box-shadow: 0 6px 20px rgba(255,107,107,0.3);
+}
+.you-are-not-alone span { font-size: 2rem; display: block; margin-bottom: 8px; }
+
+/* ── WISDOM SCREEN ── */
+.values-list { padding: 0 18px; display: flex; flex-direction: column; gap: 16px; }
+
+.value-card {
+background: white;
+border-radius: 24px;
+padding: 22px 20px;
+box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+display: flex; gap: 16px; align-items: flex-start;
+transition: all 0.25s var(–bounce);
+cursor: pointer;
+}
+.value-card:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,0,0,0.12); }
+
+.value-num {
+width: 50px; height: 50px; border-radius: 16px; flex-shrink: 0;
+display: flex; align-items: center; justify-content: center;
+font-size: 1.6rem;
+}
+.value-num.c1 { background: #FFF0F0; }
+.value-num.c2 { background: #FFF5E0; }
+.value-num.c3 { background: #F0F0FF; }
+.value-num.c4 { background: #E0FFF5; }
+.value-num.c5 { background: #E0F5FF; }
+.value-num.c6 { background: #F5E0FF; }
+
+.value-content {}
+.value-name { font-family: ‘Fredoka One’, cursive; font-size: 1.3rem; color: #3A3A5C; margin-bottom: 5px; }
+.value-desc { font-weight: 600; font-size: 0.88rem; color: #7C6F8E; line-height: 1.5; }
+
+.quotes-section { margin: 28px 18px 0; }
+.quotes-title {
+font-family: ‘Fredoka One’, cursive;
+font-size: 1.4rem; margin-bottom: 16px;
+display: flex; align-items: center; gap: 8px;
+}
+.philosopher-card {
+background: #F8F6FF;
+border-radius: 20px;
+padding: 18px 20px;
+margin-bottom: 12px;
+border-left: 4px solid var(–lavender);
+}
+.phil-quote { font-size: 0.98rem; font-weight: 700; color: #3A3A5C; font-style: italic; line-height: 1.55; }
+.phil-name  { font-size: 0.78rem; font-weight: 800; color: var(–lavender); margin-top: 8px; text-transform: uppercase; letter-spacing: 1px; }
+
+/* ── MISSION BANNER ── */
+.mission-banner {
+background: linear-gradient(135deg, #3A3A5C, #5A4070);
+color: white;
+border-radius: 24px;
+margin: 0 18px 20px;
+padding: 24px;
+text-align: center;
+box-shadow: 0 8px 28px rgba(58,58,92,0.30);
+}
+.mission-banner .m-icon { font-size: 2.5rem; margin-bottom: 10px; display: block; }
+.mission-banner h3 { font-family: ‘Fredoka One’, cursive; font-size: 1.4rem; margin-bottom: 8px; }
+.mission-banner p  { font-weight: 600; font-size: 0.9rem; line-height: 1.55; opacity: 0.9; }
+
+/* ── ENTRANCE ANIMATIONS ── */
+@keyframes slideUp {
+from { opacity: 0; transform: translateY(30px); }
+to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes popIn {
+from { opacity: 0; transform: scale(0.85); }
+to   { opacity: 1; transform: scale(1); }
+}
+@keyframes wiggle {
+0%,100% { transform: rotate(0deg); }
+25%      { transform: rotate(-8deg); }
+75%      { transform: rotate(8deg); }
+}
+
+.animate-slide { animation: slideUp 0.5s var(–bounce) both; }
+.animate-pop   { animation: popIn  0.4s var(–bounce) both; }
+
+.delay-1 { animation-delay: 0.05s; }
+.delay-2 { animation-delay: 0.10s; }
+.delay-3 { animation-delay: 0.15s; }
+.delay-4 { animation-delay: 0.20s; }
+.delay-5 { animation-delay: 0.25s; }
+.delay-6 { animation-delay: 0.30s; }
+.delay-7 { animation-delay: 0.35s; }
+.delay-8 { animation-delay: 0.40s; }
+
+/* ── PULSE on hero emoji ── */
+.pulse {
+animation: pulseEmoji 2.5s ease-in-out infinite;
+}
+@keyframes pulseEmoji {
+0%,100% { transform: scale(1); }
+50%      { transform: scale(1.1); }
+}
+
+/* ── SOON badge ── */
+.soon-badge {
+display: inline-block;
+background: var(–mint);
+color: white;
+font-size: 0.68rem;
+font-weight: 800;
+padding: 3px 10px;
+border-radius: 50px;
+text-transform: uppercase;
+letter-spacing: 1px;
+margin-left: 6px;
+vertical-align: middle;
+}
+
+/* Scroll behaviour */
+html { scroll-behavior: smooth; }
 </style>
+
 </head>
 <body>
-<div class="app">
-<div class="screen active" id="s-home">
-<div class="scroll">
-  <div class="home-hero">
-    <div class="rings"><div class="ring"></div><div class="ring"></div><div class="ring"></div></div>
-    <div class="tree">
-      <svg viewBox="0 0 90 90" fill="none">
-        <circle cx="45" cy="45" r="42" stroke="rgba(93,219,110,0.2)" stroke-width="0.7"/>
-        <circle cx="45" cy="45" r="33" stroke="rgba(93,219,110,0.1)" stroke-width="0.7"/>
-        <line x1="45" y1="3" x2="45" y2="13" stroke="rgba(130,230,145,0.5)" stroke-width="1.2"/>
-        <line x1="45" y1="77" x2="45" y2="87" stroke="rgba(130,230,145,0.5)" stroke-width="1.2"/>
-        <line x1="3" y1="45" x2="13" y2="45" stroke="rgba(130,230,145,0.5)" stroke-width="1.2"/>
-        <line x1="77" y1="45" x2="87" y2="45" stroke="rgba(130,230,145,0.5)" stroke-width="1.2"/>
-        <rect x="43.5" y="52" width="3" height="16" rx="1.5" fill="rgba(130,230,145,0.55)"/>
-        <path d="M45 52 Q34 43 29 35" stroke="rgba(130,230,145,0.5)" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <path d="M45 52 Q56 43 61 35" stroke="rgba(130,230,145,0.5)" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <path d="M45 44 Q37 37 33 28" stroke="rgba(130,230,145,0.35)" stroke-width="1.4" fill="none" stroke-linecap="round"/>
-        <path d="M45 44 Q53 37 57 28" stroke="rgba(130,230,145,0.35)" stroke-width="1.4" fill="none" stroke-linecap="round"/>
-        <circle cx="45" cy="45" r="5" fill="rgba(160,245,175,0.1)"/>
-        <circle cx="45" cy="45" r="2.5" fill="rgba(180,255,190,0.35)"/>
-      </svg>
+
+<!-- Decorative background -->
+
+<div class="bg-canvas">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="blob blob-4"></div>
+</div>
+<div class="stars" id="starsContainer"></div>
+
+<!-- ════════════════ HOME SCREEN ════════════════ -->
+
+<div class="screen active" id="screen-home">
+
+  <div class="top-header animate-slide">
+    <div class="logo-badge">✨ A Life's Calling</div>
+    <h1 class="main-title">The Wisdom<br>Project</h1>
+    <p class="main-subtitle">Ancient wisdom. Real feelings.<br>Made for kids like you. 🌱</p>
+  </div>
+
+  <div class="quote-card animate-slide delay-2">
+    <p class="quote-text">"Do you have the patience to wait until your mud settles and the water is clear?"</p>
+    <p class="quote-author">— Lao Tzu</p>
+  </div>
+
+  <button class="big-btn btn-feel animate-pop delay-3" onclick="goTo('screen-feel')">
+    <span class="btn-icon">💭</span>
+    <span class="btn-label">How Do I Feel?</span>
+    <span class="btn-desc">Bullied? Scared? Angry? Find your wisdom →</span>
+  </button>
+
+  <button class="big-btn btn-wisdom animate-pop delay-4" onclick="goTo('screen-wisdom')">
+    <span class="btn-icon">🌿</span>
+    <span class="btn-label">Stoic Wisdom</span>
+    <span class="btn-desc">6 big values from the greatest minds ever →</span>
+  </button>
+
+  <button class="big-btn btn-soon animate-pop delay-5" style="cursor:default;">
+    <span class="btn-icon">🎵</span>
+    <span class="btn-label">Music & Healing <span class="soon-badge">Soon</span></span>
+    <span class="btn-desc">Healing music sessions with Edita. 🎶</span>
+  </button>
+
+  <div class="mission-banner animate-slide delay-6">
+    <span class="m-icon">⭐</span>
+    <h3>Our Mission</h3>
+    <p>Teaching kids <strong>Stoicism, values & kindness</strong> — so every child knows they are never alone with a big feeling.</p>
+  </div>
+
+</div>
+
+<!-- ════════════════ FEEL SCREEN ════════════════ -->
+
+<div class="screen" id="screen-feel">
+
+  <h2 class="screen-title animate-slide">💭 How Do I Feel?</h2>
+  <p class="screen-sub animate-slide delay-1">Tap what you're feeling right now.<br>You'll get real wisdom — and you are <strong>NOT alone</strong>. 💛</p>
+
+  <div class="feelings-grid">
+    <div class="feeling-card animate-pop delay-1" data-color="coral" onclick="showResponse('mean')">
+      <span class="feeling-emoji">😤</span>
+      <div class="feeling-title">Someone was mean to me</div>
+      <div class="feeling-desc">Bullying, cruel words, left out on purpose</div>
     </div>
-    <div class="hero-tag">✨ A Life's Calling</div>
-    <div class="hero-title">The <span>Wisdom</span><br>Project</div>
-    <div class="hero-sub">Ancient wisdom. Real feelings.<br>Made for kids like you. 🌱</div>
-    <div class="hero-quote-box">
-      <div class="hero-quote">"Do you have the patience to wait until your mud settles and the water is clear?"</div>
-      <div class="hero-attr">— LAO TZU</div>
+    <div class="feeling-card animate-pop delay-2" data-color="peach" onclick="showResponse('scared')">
+      <span class="feeling-emoji">😨</span>
+      <div class="feeling-title">Scared about the future</div>
+      <div class="feeling-desc">School, exams, change, the unknown</div>
+    </div>
+    <div class="feeling-card animate-pop delay-3" data-color="lavender" onclick="showResponse('regret')">
+      <span class="feeling-emoji">😔</span>
+      <div class="feeling-title">I regret something</div>
+      <div class="feeling-desc">Said something wrong, hurt someone</div>
+    </div>
+    <div class="feeling-card animate-pop delay-4" data-color="mint" onclick="showResponse('family')">
+      <span class="feeling-emoji">🏠</span>
+      <div class="feeling-title">Fighting with family</div>
+      <div class="feeling-desc">Parents, siblings, arguments at home</div>
+    </div>
+    <div class="feeling-card animate-pop delay-5" data-color="sky" onclick="showResponse('alone')">
+      <span class="feeling-emoji">🌧️</span>
+      <div class="feeling-title">I feel left out</div>
+      <div class="feeling-desc">Lonely, invisible, like nobody cares</div>
+    </div>
+    <div class="feeling-card animate-pop delay-6" data-color="coral" onclick="showResponse('angry')">
+      <span class="feeling-emoji">🔥</span>
+      <div class="feeling-title">I feel really angry</div>
+      <div class="feeling-desc">Rage, frustration, it's not fair</div>
+    </div>
+    <div class="feeling-card animate-pop delay-7" data-color="pink" onclick="showResponse('forgive')">
+      <span class="feeling-emoji">🕊️</span>
+      <div class="feeling-title">I need to forgive</div>
+      <div class="feeling-desc">Someone hurt me and I'm still carrying it</div>
+    </div>
+    <div class="feeling-card animate-pop delay-8" data-color="lavender" onclick="showResponse('lost')">
+      <span class="feeling-emoji">🌱</span>
+      <div class="feeling-title">Who even am I?</div>
+      <div class="feeling-desc">Lost, confused, searching for myself</div>
     </div>
   </div>
-  <div class="mission">
-    <div class="mission-tag">⭐ Our Mission</div>
-    <div class="mission-text">Teaching kids <em>Stoicism, values &amp; kindness</em> — so every child knows they are never alone with a big feeling.</div>
-  </div>
-  <div class="h-cards">
-    <div class="h-label">Jump In</div>
-    <div class="h-card" onclick="goTo('s-feel')" style="background:linear-gradient(135deg,rgba(255,107,107,0.15),rgba(180,40,40,0.1));border-color:rgba(255,107,107,0.2);">
-      <div class="h-card-emoji">💭</div>
-      <div class="h-card-body">
-        <div class="h-card-title" style="color:#ff8f8f;">How Do I Feel?</div>
-        <div class="h-card-sub">Bullied? Scared? Angry? Find your wisdom right now.</div>
+
+</div>
+
+<!-- ════════════════ RESPONSE SCREEN ════════════════ -->
+
+<div class="screen" id="screen-response">
+  <button class="back-btn" onclick="goTo('screen-feel')">← Back</button>
+  <div id="response-content"></div>
+</div>
+
+<!-- ════════════════ WISDOM SCREEN ════════════════ -->
+
+<div class="screen" id="screen-wisdom">
+
+  <h2 class="screen-title animate-slide">⭐ Wisdom</h2>
+  <p class="screen-sub animate-slide delay-1">The 6 Big Values 🌿<br>Not rules — <strong>truths</strong>. Lived and proven by real humans.</p>
+
+  <div class="values-list">
+    <div class="value-card animate-slide delay-1">
+      <div class="value-num c1">❤️</div>
+      <div class="value-content">
+        <div class="value-name">Forgiveness</div>
+        <div class="value-desc">The wound became the wisdom. Forgiveness doesn't mean what happened was OK — it means you choose to put the heavy stone down. You forgive for <em>you</em>.</div>
       </div>
-      <div class="h-card-arrow">›</div>
     </div>
-    <div class="h-card" onclick="goTo('s-wisdom')" style="background:linear-gradient(135deg,rgba(93,219,110,0.12),rgba(40,112,58,0.08));border-color:rgba(93,219,110,0.2);">
-      <div class="h-card-emoji">🌿</div>
-      <div class="h-card-body">
-        <div class="h-card-title" style="color:#5ddb6e;">Stoic Wisdom</div>
-        <div class="h-card-sub">6 values + quotes from the greatest minds ever.</div>
+    <div class="value-card animate-slide delay-2">
+      <div class="value-num c2">✨</div>
+      <div class="value-content">
+        <div class="value-name">Amor Fati</div>
+        <div class="value-desc">Latin for "love your fate." Not giving up — actively loving what life gives you, even the hard parts. Every obstacle is secretly a door.</div>
       </div>
-      <div class="h-card-arrow">›</div>
     </div>
-    <div class="h-card" style="background:linear-gradient(135deg,rgba(240,192,96,0.1),rgba(160,112,40,0.08));border-color:rgba(240,192,96,0.18);opacity:.7;">
-      <div class="h-card-emoji">🎵</div>
-      <div class="h-card-body">
-        <div class="h-card-title" style="color:#f0c060;">Music &amp; Healing</div>
-        <div class="h-card-sub">Healing music sessions — coming soon with Edita. 🎶</div>
+    <div class="value-card animate-slide delay-3">
+      <div class="value-num c3">🔮</div>
+      <div class="value-content">
+        <div class="value-name">Synchronicity</div>
+        <div class="value-desc">Nothing arrives by accident. When things align — that's the universe sending a message. The timing is always telling you something.</div>
       </div>
-      <div style="font-size:11px;font-weight:700;color:rgba(240,192,96,0.5);padding:3px 10px;background:rgba(240,192,96,0.1);border-radius:10px;white-space:nowrap;">Soon</div>
+    </div>
+    <div class="value-card animate-slide delay-4">
+      <div class="value-num c4">💙</div>
+      <div class="value-content">
+        <div class="value-name">Kindness</div>
+        <div class="value-desc">A whole career built without ever being cruel — proof that being kind is not weakness. It is the <em>strongest</em> thing a person can be.</div>
+      </div>
+    </div>
+    <div class="value-card animate-slide delay-5">
+      <div class="value-num c5">🌳</div>
+      <div class="value-content">
+        <div class="value-name">Long-Term Thinking</div>
+        <div class="value-desc">The oak doesn't argue with winter. It roots deeper and waits. Spring always returns — every single time.</div>
+      </div>
+    </div>
+    <div class="value-card animate-slide delay-6">
+      <div class="value-num c6">🎵</div>
+      <div class="value-content">
+        <div class="value-name">Grace</div>
+        <div class="value-desc">What begins as conflict, time can transform into something beautiful. Music heals what words can't reach.</div>
+      </div>
     </div>
   </div>
-</div>
-<nav class="nav">
-  <button class="nb on" onclick="goTo('s-home')"><div class="nb-icon">🏠</div><div class="nb-label">Home</div></button>
-  <button class="nb" onclick="goTo('s-feel')"><div class="nb-icon">💭</div><div class="nb-label">I Feel...</div></button>
-  <button class="nb" onclick="goTo('s-wisdom')"><div class="nb-icon">⭐</div><div class="nb-label">Wisdom</div></button>
-</nav>
-</div>
-<div class="screen" id="s-feel">
-<div class="tbar"><div class="tbar-title">💭 How Do I Feel?</div></div>
-<div class="scroll">
-  <div class="feel-intro">
-    <div class="feel-big">What's going on? 👇</div>
-    <div class="feel-sub">Tap what you're feeling. You'll get real wisdom — and you are NOT alone.</div>
-  </div>
-  <div class="feel-grid">
-    <div class="fc" onclick="showF('bully')" style="background:linear-gradient(145deg,rgba(255,107,107,0.18),rgba(180,40,40,0.12));"><span class="fc-emoji">😤</span><div class="fc-label">Someone was mean to me</div><div class="fc-sub">Bullying, cruel words, being left out on purpose</div></div>
-    <div class="fc" onclick="showF('fear')" style="background:linear-gradient(145deg,rgba(96,180,255,0.18),rgba(40,90,180,0.12));"><span class="fc-emoji">😨</span><div class="fc-label">Scared about the future</div><div class="fc-sub">School, exams, change, the unknown</div></div>
-    <div class="fc" onclick="showF('regret')" style="background:linear-gradient(145deg,rgba(176,107,255,0.18),rgba(100,40,180,0.12));"><span class="fc-emoji">😔</span><div class="fc-label">I regret something</div><div class="fc-sub">Said the wrong thing, hurt someone</div></div>
-    <div class="fc" onclick="showF('family')" style="background:linear-gradient(145deg,rgba(255,159,64,0.18),rgba(180,90,20,0.12));"><span class="fc-emoji">🏠</span><div class="fc-label">Fighting with family</div><div class="fc-sub">Parents, siblings, arguments at home</div></div>
-    <div class="fc" onclick="showF('alone')" style="background:linear-gradient(145deg,rgba(64,221,200,0.18),rgba(20,130,120,0.12));"><span class="fc-emoji">🌧️</span><div class="fc-label">I feel left out</div><div class="fc-sub">Lonely, invisible, like nobody cares</div></div>
-    <div class="fc" onclick="showF('angry')" style="background:linear-gradient(145deg,rgba(255,208,96,0.18),rgba(180,120,20,0.12));"><span class="fc-emoji">🔥</span><div class="fc-label">I feel really angry</div><div class="fc-sub">Rage, frustration, it's not fair</div></div>
-    <div class="fc" onclick="showF('forgive')" style="background:linear-gradient(145deg,rgba(168,216,122,0.18),rgba(80,150,40,0.12));"><span class="fc-emoji">🕊️</span><div class="fc-label">I need to forgive</div><div class="fc-sub">Someone hurt me and I'm still carrying it</div></div>
-    <div class="fc" onclick="showF('identity')" style="background:linear-gradient(145deg,rgba(93,219,110,0.18),rgba(30,110,50,0.12));"><span class="fc-emoji">🌱</span><div class="fc-label">Who even am I?</div><div class="fc-sub">Lost, confused, searching for myself</div></div>
-  </div>
-</div>
-<nav class="nav">
-  <button class="nb" onclick="goTo('s-home')"><div class="nb-icon">🏠</div><div class="nb-label">Home</div></button>
-  <button class="nb on" onclick="goTo('s-feel')"><div class="nb-icon">💭</div><div class="nb-label">I Feel...</div></button>
-  <button class="nb" onclick="goTo('s-wisdom')"><div class="nb-icon">⭐</div><div class="nb-label">Wisdom</div></button>
-</nav>
-</div>
-<div class="screen" id="s-fdetail">
-<div class="tbar">
-  <button class="tbar-back" onclick="goTo('s-feel')">‹ Back</button>
-  <div style="width:60px"></div>
-</div>
-<div class="scroll">
-  <div class="fd-top"><span class="fd-emoji" id="fd-emoji"></span><div class="fd-title" id="fd-title"></div></div>
-  <div class="fd-body" id="fd-body"></div>
-  <div style="height:16px"></div>
-</div>
-</div>
-<div class="screen" id="s-wisdom">
-<div class="tbar"><div class="tbar-title">⭐ Wisdom</div></div>
-<div class="scroll">
-  <div class="wis-intro"><div class="wis-big">The 6 Values 🌿</div><div class="wis-sub">Not rules. Truths. Lived and proven by real humans — starting with you.</div></div>
-  <div class="val-list">
-    <div class="vc" style="background:linear-gradient(135deg,rgba(255,107,107,0.1),rgba(15,31,20,0.8));"><div class="vc-stripe" style="background:linear-gradient(to bottom,#ff6b6b,#c44)"></div><div class="vc-head"><div class="vc-num">I</div><div class="vc-title">❤️ Forgiveness</div></div><div class="vc-desc">The wound became the wisdom. Forgiveness doesn't mean what happened was OK — it means you choose to put the heavy stone down. You forgive for YOU.</div></div>
-    <div class="vc" style="background:linear-gradient(135deg,rgba(240,192,96,0.1),rgba(15,31,20,0.8));"><div class="vc-stripe" style="background:linear-gradient(to bottom,#f0c060,#c09030)"></div><div class="vc-head"><div class="vc-num">II</div><div class="vc-title">✨ Amor Fati</div></div><div class="vc-desc">Latin for "love your fate." Not giving up — actively loving what life gives you, even the hard parts. Every obstacle is secretly a door.</div></div>
-    <div class="vc" style="background:linear-gradient(135deg,rgba(176,107,255,0.1),rgba(15,31,20,0.8));"><div class="vc-stripe" style="background:linear-gradient(to bottom,#b06bff,#7040b0)"></div><div class="vc-head"><div class="vc-num">III</div><div class="vc-title">🔮 Synchronicity</div></div><div class="vc-desc">Nothing arrives by accident. When things align — that's the universe sending a message. The timing is always telling you something.</div></div>
-    <div class="vc" style="background:linear-gradient(135deg,rgba(96,180,255,0.1),rgba(15,31,20,0.8));"><div class="vc-stripe" style="background:linear-gradient(to bottom,#60b4ff,#3d70b0)"></div><div class="vc-head"><div class="vc-num">IV</div><div class="vc-title">💙 Kindness</div></div><div class="vc-desc">A whole career built without ever being cruel — proof that being kind is not weakness. It is the strongest thing a person can be.</div></div>
-    <div class="vc" style="background:linear-gradient(135deg,rgba(93,219,110,0.1),rgba(15,31,20,0.8));"><div class="vc-stripe" style="background:linear-gradient(to bottom,#5ddb6e,#3a9e4e)"></div><div class="vc-head"><div class="vc-num">V</div><div class="vc-title">🌳 Long-Term Thinking</div></div><div class="vc-desc">The oak doesn't argue with winter. It roots deeper and waits. Spring always returns — every single time.</div></div>
-    <div class="vc" style="background:linear-gradient(135deg,rgba(64,221,200,0.1),rgba(15,31,20,0.8));"><div class="vc-stripe" style="background:linear-gradient(to bottom,#40ddc8,#20908a)"></div><div class="vc-head"><div class="vc-num">VI</div><div class="vc-title">🎵 Grace</div></div><div class="vc-desc">What begins as conflict, time can transform into something beautiful. Music heals what words can't reach.</div></div>
-  </div>
-  <div class="sq-section" style="margin-top:10px;">
-    <div class="sq-label">From the Stoics 📜</div>
-    <div class="sq-list">
-      <div class="sq"><div class="sq-text">"You have power over your mind — not outside events. Realise this, and you will find strength."</div><div class="sq-attr">— MARCUS AURELIUS</div></div>
-      <div class="sq"><div class="sq-text">"We suffer more in imagination than in reality."</div><div class="sq-attr">— SENECA</div></div>
-      <div class="sq"><div class="sq-text">"Make the best use of what is in your power, and take the rest as it happens."</div><div class="sq-attr">— EPICTETUS</div></div>
-      <div class="sq"><div class="sq-text">"The impediment to action advances action. What stands in the way becomes the way."</div><div class="sq-attr">— MARCUS AURELIUS</div></div>
+
+  <div class="quotes-section">
+    <div class="quotes-title animate-slide">📜 From the Stoics</div>
+    <div class="philosopher-card animate-slide delay-1">
+      <div class="phil-quote">"You have power over your mind — not outside events. Realise this, and you will find strength."</div>
+      <div class="phil-name">— Marcus Aurelius</div>
+    </div>
+    <div class="philosopher-card animate-slide delay-2">
+      <div class="phil-quote">"We suffer more in imagination than in reality."</div>
+      <div class="phil-name">— Seneca</div>
+    </div>
+    <div class="philosopher-card animate-slide delay-3">
+      <div class="phil-quote">"Make the best use of what is in your power, and take the rest as it happens."</div>
+      <div class="phil-name">— Epictetus</div>
+    </div>
+    <div class="philosopher-card animate-slide delay-4">
+      <div class="phil-quote">"The impediment to action advances action. What stands in the way becomes the way."</div>
+      <div class="phil-name">— Marcus Aurelius</div>
     </div>
   </div>
-  <div style="height:12px"></div>
+
+  <div style="height: 20px;"></div>
 </div>
-<nav class="nav">
-  <button class="nb" onclick="goTo('s-home')"><div class="nb-icon">🏠</div><div class="nb-label">Home</div></button>
-  <button class="nb" onclick="goTo('s-feel')"><div class="nb-icon">💭</div><div class="nb-label">I Feel...</div></button>
-  <button class="nb on" onclick="goTo('s-wisdom')"><div class="nb-icon">⭐</div><div class="nb-label">Wisdom</div></button>
+
+<!-- ════════════════ BOTTOM NAV ════════════════ -->
+
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="nav-home" onclick="goTo('screen-home')">
+    <span class="nav-icon">🏠</span>Home
+  </button>
+  <button class="nav-btn" id="nav-feel" onclick="goTo('screen-feel')">
+    <span class="nav-icon">💭</span>I Feel...
+  </button>
+  <button class="nav-btn" id="nav-wisdom" onclick="goTo('screen-wisdom')">
+    <span class="nav-icon">⭐</span>Wisdom
+  </button>
 </nav>
-</div>
-</div>
+
 <script>
-const ill={
-bully:`<svg viewBox="0 0 240 170" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:240px;height:auto"><circle cx="120" cy="85" r="65" fill="rgba(255,107,107,0.04)"/><ellipse cx="95" cy="145" rx="30" ry="10" fill="rgba(60,120,70,0.12)"/><path d="M78 130 Q95 136 112 130 L114 100 Q95 106 76 100Z" fill="rgba(93,219,110,0.15)" stroke="rgba(130,230,145,0.25)" stroke-width="1"/><circle cx="95" cy="82" r="18" fill="rgba(200,180,140,0.22)" stroke="rgba(220,200,160,0.38)" stroke-width="1.5"/><path d="M88 81 Q91 78 94 81" stroke="rgba(220,200,160,0.8)" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M96 81 Q99 78 102 81" stroke="rgba(220,200,160,0.8)" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M90 88 Q95 92 100 88" stroke="rgba(220,200,160,0.7)" stroke-width="1.5" fill="none" stroke-linecap="round"/><circle cx="95" cy="100" r="24" fill="none" stroke="rgba(93,219,110,0.18)" stroke-width="2"/><line x1="152" y1="65" x2="133" y2="85" stroke="rgba(255,107,107,0.6)" stroke-width="2.5" stroke-linecap="round"/><polygon points="133,85 139,76 127,79" fill="rgba(255,107,107,0.6)"/><line x1="133" y1="85" x2="148" y2="102" stroke="rgba(255,107,107,0.25)" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 3"/><line x1="160" y1="105" x2="138" y2="98" stroke="rgba(255,107,107,0.55)" stroke-width="2.5" stroke-linecap="round"/><polygon points="138,98 145,92 140,102" fill="rgba(255,107,107,0.55)"/><text x="120" y="163" text-anchor="middle" fill="rgba(255,140,140,0.65)" font-size="11" font-family="Nunito,sans-serif" font-weight="700">Their cruelty = their pain. Not your worth. 💪</text></svg>`,
-fear:`<svg viewBox="0 0 240 170" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:240px;height:auto"><circle cx="185" cy="48" r="20" fill="rgba(255,220,100,0.12)" stroke="rgba(255,220,100,0.25)" stroke-width="1"/><circle cx="185" cy="48" r="13" fill="rgba(255,220,100,0.15)"/><line x1="185" y1="22" x2="185" y2="17" stroke="rgba(255,220,100,0.35)" stroke-width="2" stroke-linecap="round"/><line x1="210" y1="48" x2="215" y2="48" stroke="rgba(255,220,100,0.35)" stroke-width="2" stroke-linecap="round"/><circle cx="40" cy="28" r="2" fill="rgba(200,220,255,0.45)"/><circle cx="62" cy="18" r="1.5" fill="rgba(200,220,255,0.4)"/><path d="M28 145 Q60 108 72 94 Q82 82 70 70 Q88 78 84 96 Q96 74 98 85 Q103 95 88 145Z" fill="rgba(100,80,160,0.18)" stroke="rgba(130,100,200,0.22)" stroke-width="1.2"/><ellipse cx="160" cy="138" rx="12" ry="8" fill="rgba(180,160,120,0.28)" stroke="rgba(200,180,140,0.4)" stroke-width="1.2"/><circle cx="155" cy="135" r="2" fill="rgba(200,180,140,0.6)"/><circle cx="165" cy="135" r="2" fill="rgba(200,180,140,0.6)"/><circle cx="120" cy="100" r="12" fill="rgba(200,180,140,0.18)" stroke="rgba(210,190,150,0.32)" stroke-width="1.2"/><text x="120" y="163" text-anchor="middle" fill="rgba(120,190,255,0.65)" font-size="11" font-family="Nunito,sans-serif" font-weight="700">The fear in your head &gt; the actual thing 😮</text></svg>`,
-oak:`<svg viewBox="0 0 240 170" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:240px;height:auto"><path d="M30,145 Q120,138 210,145" stroke="rgba(93,219,110,0.2)" stroke-width="1.5" fill="none"/><path d="M120,145 Q103,156 85,160" stroke="rgba(93,219,110,0.22)" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M120,145 Q137,158 158,162" stroke="rgba(93,219,110,0.22)" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M108,145 Q106,118 108,96 Q110,74 120,56" stroke="rgba(140,190,130,0.38)" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M118,96 Q98,86 80,74" stroke="rgba(130,220,145,0.42)" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M120,84 Q142,72 162,62" stroke="rgba(130,220,145,0.42)" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="64" cy="66" r="20" fill="rgba(80,170,95,0.2)" stroke="rgba(110,200,125,0.3)" stroke-width="1.2"/><circle cx="168" cy="54" r="18" fill="rgba(80,170,95,0.2)" stroke="rgba(110,200,125,0.3)" stroke-width="1.2"/><circle cx="120" cy="30" r="18" fill="rgba(80,170,95,0.22)" stroke="rgba(110,200,125,0.32)" stroke-width="1.2"/><circle cx="42" cy="38" r="3" fill="rgba(210,240,255,0.5)"/><circle cx="178" cy="28" r="3.5" fill="rgba(210,240,255,0.5)"/><circle cx="195" cy="62" r="2.5" fill="rgba(210,240,255,0.4)"/><text x="120" y="163" text-anchor="middle" fill="rgba(93,219,110,0.65)" font-size="11" font-family="Nunito,sans-serif" font-weight="700">Root deeper. Wait. Spring always comes back 🌳❄️</text></svg>`,
-dove:`<svg viewBox="0 0 240 170" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:240px;height:auto"><path d="M48,148 Q54,126 63,120 Q71,117 76,124 L79,137 Q74,146 65,150Z" fill="rgba(200,180,140,0.22)" stroke="rgba(210,190,155,0.38)" stroke-width="1.2"/><ellipse cx="66" cy="118" rx="12" ry="8" fill="rgba(130,130,130,0.22)" stroke="rgba(150,150,150,0.3)" stroke-width="1.2"/><path d="M162,148 Q162,126 157,120 Q149,112 142,116 L138,129 Q142,144 152,150Z" fill="rgba(200,180,140,0.22)" stroke="rgba(210,190,155,0.38)" stroke-width="1.2"/><path d="M138,82 Q126,66 116,58 Q106,52 100,58" stroke="rgba(240,248,255,0.6)" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M113,52 Q98,38 82,43 Q92,52 113,52" fill="rgba(240,248,255,0.18)" stroke="rgba(240,248,255,0.42)" stroke-width="1.2"/><path d="M113,52 Q124,35 138,40 Q130,50 113,52" fill="rgba(240,248,255,0.18)" stroke="rgba(240,248,255,0.42)" stroke-width="1.2"/><circle cx="113" cy="55" r="7" fill="rgba(240,248,255,0.22)" stroke="rgba(240,248,255,0.48)" stroke-width="1.2"/><text x="120" y="163" text-anchor="middle" fill="rgba(168,216,122,0.65)" font-size="11" font-family="Nunito,sans-serif" font-weight="700">You don't free them. You free yourself. 🕊️</text></svg>`,
-identity:`<svg viewBox="0 0 240 170" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:240px;height:auto"><ellipse cx="55" cy="128" rx="14" ry="20" fill="rgba(140,190,130,0.18)" stroke="rgba(160,210,150,0.32)" stroke-width="1.5"/><path d="M74,106 Q120,88 162,72" stroke="rgba(93,219,110,0.28)" stroke-width="1.5" fill="none"/><polygon points="162,72 154,70 155,78" fill="rgba(93,219,110,0.4)"/><rect x="167" y="112" width="7" height="32" rx="3.5" fill="rgba(130,220,145,0.38)"/><circle cx="170" cy="100" r="20" fill="rgba(80,170,90,0.2)" stroke="rgba(110,200,120,0.32)" stroke-width="1.2"/><text x="120" y="95" text-anchor="middle" fill="rgba(220,240,225,0.28)" font-size="54" font-family="Nunito,sans-serif" font-weight="900">?</text><circle cx="85" cy="58" r="3" fill="rgba(255,220,100,0.55)"/><circle cx="148" cy="50" r="2.5" fill="rgba(255,220,100,0.5)"/><text x="120" y="163" text-anchor="middle" fill="rgba(93,219,110,0.6)" font-size="11" font-family="Nunito,sans-serif" font-weight="700">The seed doesn't know it's an oak. Yet. 🌱✨</text></svg>`,
-angry:`<svg viewBox="0 0 240 170" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:240px;height:auto"><path d="M42,148 Q36,118 48,100 Q54,88 48,76 Q64,87 59,104 Q74,83 72,68 Q87,82 80,102 Q94,80 98,94 Q104,108 90,148Z" fill="rgba(255,159,64,0.14)" stroke="rgba(255,180,80,0.22)" stroke-width="1.2"/><path d="M96,106 Q120,97 144,90" stroke="rgba(255,192,80,0.38)" stroke-width="2" fill="none"/><polygon points="144,90 136,88 137,96" fill="rgba(255,192,80,0.48)"/><rect x="156" y="118" width="20" height="30" rx="3" fill="rgba(220,200,160,0.2)" stroke="rgba(220,200,160,0.32)" stroke-width="1"/><line x1="166" y1="118" x2="166" y2="111" stroke="rgba(80,50,20,0.5)" stroke-width="2"/><path d="M166,111 Q160,101 163,94 Q166,89 169,94 Q172,101 166,111Z" fill="rgba(255,220,80,0.38)" stroke="rgba(255,200,60,0.55)" stroke-width="1.2"/><rect x="104" y="96" width="4" height="11" rx="2" fill="rgba(93,219,110,0.5)"/><rect x="110" y="96" width="4" height="11" rx="2" fill="rgba(93,219,110,0.5)"/><text x="120" y="163" text-anchor="middle" fill="rgba(255,180,80,0.65)" font-size="11" font-family="Nunito,sans-serif" font-weight="700">Same fire — burns OR lights. You choose 🔥🕯️</text></svg>`,
-regret:`<svg viewBox="0 0 240 170" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:240px;height:auto"><ellipse cx="48" cy="138" rx="9" ry="5" fill="rgba(176,107,255,0.18)" transform="rotate(-12,48,138)"/><ellipse cx="66" cy="126" rx="9" ry="5" fill="rgba(176,107,255,0.22)" transform="rotate(10,66,126)"/><ellipse cx="82" cy="116" rx="9" ry="5" fill="rgba(176,107,255,0.27)" transform="rotate(-8,82,116)"/><circle cx="108" cy="100" r="12" fill="rgba(200,180,140,0.18)" stroke="rgba(210,190,150,0.32)" stroke-width="1.2"/><ellipse cx="130" cy="136" rx="9" ry="5" fill="rgba(93,219,110,0.32)" transform="rotate(-8,130,136)"/><ellipse cx="150" cy="126" rx="9" ry="5" fill="rgba(93,219,110,0.38)" transform="rotate(10,150,126)"/><ellipse cx="168" cy="114" rx="9" ry="5" fill="rgba(93,219,110,0.44)" transform="rotate(-8,168,114)"/><ellipse cx="186" cy="100" rx="9" ry="5" fill="rgba(93,219,110,0.5)" transform="rotate(10,186,100)"/><text x="120" y="163" text-anchor="middle" fill="rgba(176,107,255,0.65)" font-size="11" font-family="Nunito,sans-serif" font-weight="700">Your conscience works! Now face forward 👣➡️</text></svg>`,
-family:`<svg viewBox="0 0 240 170" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:240px;height:auto"><circle cx="70" cy="90" r="14" fill="rgba(200,180,140,0.2)" stroke="rgba(210,190,150,0.35)" stroke-width="1.2"/><path d="M60,104 Q70,110 80,104 L82,134 Q70,138 58,134Z" fill="rgba(255,159,64,0.15)" stroke="rgba(255,180,80,0.25)" stroke-width="1"/><circle cx="170" cy="90" r="14" fill="rgba(200,180,140,0.2)" stroke="rgba(210,190,150,0.35)" stroke-width="1.2"/><path d="M160,104 Q170,110 180,104 L182,134 Q170,138 158,134Z" fill="rgba(96,180,255,0.14)" stroke="rgba(120,200,255,0.22)" stroke-width="1"/><path d="M100,108 Q120,99 140,108" stroke="rgba(255,159,64,0.45)" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M108,84 Q108,76 113,76 Q117,76 118,80 Q119,76 123,76 Q128,76 128,84 Q128,92 118,100 Q108,92 108,84Z" fill="rgba(255,107,107,0.12)" stroke="rgba(255,107,107,0.25)" stroke-width="1.2"/><text x="120" y="163" text-anchor="middle" fill="rgba(255,159,64,0.65)" font-size="11" font-family="Nunito,sans-serif" font-weight="700">Right OR connected? Almost never both 🏠❤️</text></svg>`,
-alone:`<svg viewBox="0 0 240 170" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:240px;height:auto"><path d="M78,56 Q78,42 89,40 Q92,31 103,31 Q111,25 122,29 Q136,27 140,38 Q152,40 150,53 Q152,62 138,64 L83,64 Q72,64 78,56Z" fill="rgba(130,170,220,0.18)" stroke="rgba(150,190,240,0.3)" stroke-width="1"/><line x1="88" y1="67" x2="85" y2="79" stroke="rgba(130,190,255,0.42)" stroke-width="1.5" stroke-linecap="round"/><line x1="100" y1="67" x2="97" y2="81" stroke="rgba(130,190,255,0.42)" stroke-width="1.5" stroke-linecap="round"/><line x1="112" y1="67" x2="109" y2="80" stroke="rgba(130,190,255,0.42)" stroke-width="1.5" stroke-linecap="round"/><circle cx="90" cy="103" r="12" fill="rgba(200,180,140,0.2)" stroke="rgba(210,190,150,0.3)" stroke-width="1.2"/><circle cx="170" cy="100" r="12" fill="rgba(200,180,140,0.2)" stroke="rgba(210,190,150,0.3)" stroke-width="1.2"/><rect x="185" y="100" width="12" height="16" rx="4" fill="rgba(255,220,100,0.15)" stroke="rgba(255,220,100,0.38)" stroke-width="1"/><path d="M38,145 Q90,68 170,145" stroke="rgba(220,150,250,0.1)" stroke-width="4" fill="none"/><path d="M50,145 Q90,84 160,145" stroke="rgba(93,219,110,0.1)" stroke-width="4" fill="none"/><text x="120" y="163" text-anchor="middle" fill="rgba(96,180,255,0.65)" font-size="11" font-family="Nunito,sans-serif" font-weight="700">Find someone alone. That cures YOUR loneliness 🌈</text></svg>`
-};
-const fd={
-bully:{emoji:'😤',title:'Someone Was Mean To Me',color:'rgba(255,107,107,0.12)',accent:'#ff8f8f',tagColor:'rgba(255,107,107,0.2)',tagText:'rgba(255,140,140,1)',quote:'"You have power over your mind — not outside events. Realise this, and you will find strength."',attr:'MARCUS AURELIUS',wisdom:'When someone is mean to you, they are showing you their own pain — not your worth. A person who is truly happy and at peace does not try to hurt others. Their cruelty says everything about them and nothing about you.',practice:'<strong>Tonight, write:</strong> What they said or did. Then write: "This tells me they are suffering." Then write ONE thing you know is true and good about yourself. Read it out loud.',illusKey:'bully',illusCap:'The Stoic stays calm — arrows bounce off the shield of a clear conscience.',vidTitle:'Why being mean is a cry for help (and what to do)'},
-fear:{emoji:'😨',title:'Scared About The Future',color:'rgba(96,180,255,0.12)',accent:'#80c4ff',tagColor:'rgba(96,180,255,0.2)',tagText:'rgba(130,200,255,1)',quote:'"We suffer more in imagination than in reality."',attr:'SENECA',wisdom:"Fear of the future lives entirely in your mind right now. The future hasn't happened yet. What is real is this moment — and in this moment, you are safe. The monster in your head is always bigger than the real thing.",practice:"<strong>Ask yourself three questions:</strong> What exactly am I afraid of? Is it happening right now? What is ONE small thing I can do today — only today? Nothing more.",illusKey:'fear',illusCap:'The shadow of fear is always bigger than the thing casting it.',vidTitle:"How your brain creates fears that aren't even real"},
-regret:{emoji:'😔',title:'I Regret Something I Did',color:'rgba(176,107,255,0.12)',accent:'#c08fff',tagColor:'rgba(176,107,255,0.2)',tagText:'rgba(200,140,255,1)',quote:'"Waste no more time arguing what a good person should be. Be one."',attr:'MARCUS AURELIUS',wisdom:'Regret means your conscience is working — and that is not weakness, that is wisdom beginning. You cannot change what happened. But you can choose what happens next, and THAT choice is entirely yours.',practice:"<strong>Three steps:</strong> Say honestly what happened. Ask: can I make it right? Then do ONE kind act today — for anyone. Let that be the new direction you face.",illusKey:'regret',illusCap:'Every step behind you is the ground you stand on. Face forward.',vidTitle:'How to turn your worst mistake into your best lesson'},
-family:{emoji:'🏠',title:'Fighting With Family',color:'rgba(255,159,64,0.12)',accent:'#ffb86e',tagColor:'rgba(255,159,64,0.2)',tagText:'rgba(255,180,100,1)',quote:'"First say to yourself what you would be, then do what you have to do."',attr:'EPICTETUS',wisdom:"The people we love most are the ones we fight with most — because we care. The question is never who is right. It is who you want to BE.",practice:"<strong>Before your next conversation:</strong> Ask yourself — do I want to be right, or do I want to be connected? You can almost never have both. Choose the one that matters most.",illusKey:'family',illusCap:"Two people who care deeply will clash. That's not the end — that's the depth.",vidTitle:'Why we fight most with the people we love most'},
-alone:{emoji:'🌧️',title:'I Feel Left Out',color:'rgba(64,221,200,0.12)',accent:'#60e8d8',tagColor:'rgba(64,221,200,0.2)',tagText:'rgba(100,235,220,1)',quote:'"Never let the future disturb you. You will meet it with the same weapons of reason."',attr:'MARCUS AURELIUS',wisdom:'Feeling left out is one of the most painful human experiences. Every person alive — every philosopher, every emperor, every kid in your class — has felt exactly this. You are not strange. You are human.',practice:'<strong>Find one person</strong> who might also feel alone right now — in your class, your building, anywhere. The loneliness you feel dissolves fastest when you help someone else with theirs.',illusKey:'alone',illusCap:'Someone is already walking toward you with a lantern. And you can be that for another.',vidTitle:'The loneliness everyone feels but nobody talks about'},
-angry:{emoji:'🔥',title:'I Feel Really Angry',color:'rgba(255,208,96,0.12)',accent:'#ffd060',tagColor:'rgba(255,208,96,0.2)',tagText:'rgba(255,220,110,1)',quote:'"How much more grievous are the consequences of anger than the causes of it."',attr:'MARCUS AURELIUS',wisdom:'Anger is information — it tells you something important to you has been violated. The skill is not to kill your anger, but to let it speak without letting it drive. Fire can burn a house or light a candle.',practice:"<strong>When anger rises:</strong> Say: 'I am angry because ___ matters to me.' Name what matters. Then wait TEN minutes before doing anything. The action after the pause is always wiser.",illusKey:'angry',illusCap:'Same fire — can burn wildly or light one candle that changes everything.',vidTitle:'What your anger is actually trying to tell you'},
-forgive:{emoji:'🕊️',title:'I Need To Forgive Someone',color:'rgba(168,216,122,0.12)',accent:'#a8e87a',tagColor:'rgba(168,216,122,0.2)',tagText:'rgba(190,230,140,1)',quote:'"The weak can never forgive. Forgiveness is the attribute of the strong."',attr:'GANDHI',wisdom:"Forgiveness is not saying what they did was acceptable. It is setting yourself free. You forgive for YOURSELF — not for them. The stone is heavy. You are allowed to put it down.",practice:"<strong>Try this thought:</strong> The person who hurt you was once a child too — afraid, confused. You don't have to forget. You don't have to trust them again. Just put the stone down.",illusKey:'dove',illusCap:"You don't release them. You release yourself.",vidTitle:"What forgiveness really means (and what it definitely doesn't)"},
-identity:{emoji:'🌱',title:"Who Even Am I?",color:'rgba(93,219,110,0.12)',accent:'#6de882',tagColor:'rgba(93,219,110,0.2)',tagText:'rgba(120,230,135,1)',quote:'"Know thyself."',attr:'SOCRATES',wisdom:"Not knowing who you are is not a problem — it is the beginning of the most important journey a person will ever take. The ones who think they already know themselves completely stopped growing long ago. The question mark is the gift.",practice:"<strong>Write down:</strong> Three things that make you feel most alive. Three things you'd defend no matter what. Three people you admire and why. That person reading those words — that's you.",illusKey:'identity',illusCap:"The seed doesn't know it's an oak. That doesn't stop it becoming one.",vidTitle:"Why not knowing who you are is actually a superpower"}
-};
-let cur='s-home';
-function goTo(id){
-  if(id===cur)return;
-  const o=document.getElementById(cur),n=document.getElementById(id);
-  if(!n)return;
-  o.classList.add('exit');
-  setTimeout(()=>{o.classList.remove('active','exit');n.classList.add('active');cur=id;},270);
+// ── STAR GENERATOR ──
+const starEmojis = ['⭐','✨','🌟','💫','🌸','🍀'];
+const starsContainer = document.getElementById('starsContainer');
+for (let i = 0; i < 18; i++) {
+  const star = document.createElement('div');
+  star.className = 'star';
+  star.textContent = starEmojis[Math.floor(Math.random() * starEmojis.length)];
+  star.style.left = Math.random() * 100 + '%';
+  star.style.top  = Math.random() * 100 + '%';
+  star.style.fontSize = (0.8 + Math.random() * 1.0) + 'rem';
+  star.style.animationDelay = (Math.random() * 4) + 's';
+  star.style.animationDuration = (2.5 + Math.random() * 2) + 's';
+  starsContainer.appendChild(star);
 }
-function showF(key){
-  const d=fd[key];
-  document.getElementById('fd-emoji').textContent=d.emoji;
-  document.getElementById('fd-title').textContent=d.title;
-  document.getElementById('fd-body').innerHTML=`
-    <div class="dc" style="background:${d.color};border:1.5px solid ${d.tagColor};"><div class="dc-tag" style="background:${d.tagColor};color:${d.tagText};">📖 Stoic Wisdom</div><div class="dc-quote">${d.quote}</div><div class="dc-attr" style="color:${d.accent};">— ${d.attr}</div></div>
-    <div class="dc" style="background:var(--bg2);border:1.5px solid var(--border);"><div class="dc-tag" style="background:rgba(255,255,255,0.06);color:var(--t3);">💡 What This Means For You</div><div class="dc-text">${d.wisdom}</div></div>
-    <div class="illus-card"><div class="illus-tag-bar">🎨 Stoic Illustration</div><div class="illus-inner">${ill[d.illusKey]||''}</div><div class="illus-cap">${d.illusCap}</div></div>
-    <div class="vid-card"><div class="vid-tag-bar">🎬 Watch &amp; Reflect</div><div class="vid-thumb" id="vt-${key}" onclick="playVid('${key}')"><div class="vid-bg"></div><div class="vid-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><div class="vid-info"><div class="vid-ttl">${d.vidTitle}</div><div class="vid-meta">The Wisdom Project · Coming Soon 🎬</div></div></div>
-    <div class="dc" style="background:var(--bg2);border:1.5px solid var(--border);"><div class="dc-tag" style="background:rgba(93,219,110,0.12);color:var(--g1);">✍️ Try This Now</div><div class="dc-practice">${d.practice}</div></div>
+
+// ── NAVIGATION ──
+function goTo(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  window.scrollTo(0, 0);
+
+  // Update nav active state
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const map = { 'screen-home': 'nav-home', 'screen-feel': 'nav-feel', 'screen-wisdom': 'nav-wisdom' };
+  if (map[screenId]) document.getElementById(map[screenId]).classList.add('active');
+}
+
+// ── RESPONSE DATA ──
+const responses = {
+  mean: {
+    emoji: '😤',
+    title: 'When Someone is Mean',
+    color: '#FF6B6B',
+    body: `When someone says or does something cruel to you, it really hurts. That pain is real and valid. But here's a secret the Stoics discovered 2,000 years ago: <strong>you cannot control what others do — only how you respond.</strong><br><br>Their cruelty says everything about <em>them</em>, and nothing about your worth.`,
+    pill: 'Stoic Principle: Acceptance',
+    quote: '"You have power over your mind — not outside events. Realise this, and you will find strength."',
+    philosopher: 'Marcus Aurelius',
+    practice: [
+      'Take 3 deep breaths. Let the first wave of anger pass.',
+      'Write down exactly what happened and how it made you feel.',
+      'Ask: "Can I control this person\'s behaviour?" (No!) "Can I control my reaction?" (Yes!)',
+      'Tell a trusted adult — you don\'t have to carry this alone.'
+    ]
+  },
+  scared: {
+    emoji: '😨',
+    title: 'When You Feel Scared',
+    color: '#FF9F43',
+    body: `Fear about the future is one of the most common feelings in the world. Even adults feel it — every single day. Seneca, one of the greatest Stoics, had a powerful idea: <strong>we suffer far more in imagination than in reality.</strong><br><br>Your brain is trying to protect you. But it often makes things bigger than they are.`,
+    pill: 'Stoic Principle: Logos',
+    quote: '"We suffer more in imagination than in reality."',
+    philosopher: 'Seneca',
+    practice: [
+      'Write down your fear in one clear sentence.',
+      'Ask: "What is the worst that could actually happen?"',
+      'Ask: "If that happened, could I survive it?" (Almost always: yes.)',
+      'Focus only on what you can do TODAY — one small step.'
+    ]
+  },
+  regret: {
+    emoji: '😔',
+    title: 'When You Regret Something',
+    color: '#C77DFF',
+    body: `Regret means you care — and caring is a sign of good character. The Stoics believed in something called <strong>Amor Fati</strong>: love your fate. That includes your mistakes. They are not failures. They are your greatest teachers.<br><br>What matters now is not what you did — it's what you choose to do next.`,
+    pill: 'Stoic Principle: Amor Fati',
+    quote: '"Make the best use of what is in your power, and take the rest as it happens."',
+    philosopher: 'Epictetus',
+    practice: [
+      'Acknowledge honestly: "I made a mistake. That\'s human."',
+      'If you hurt someone — apologise. A simple, sincere sorry is brave.',
+      'Ask: "What did this teach me?" Write the lesson down.',
+      'Then: let it go. You cannot change the past. You can change today.'
+    ]
+  },
+  family: {
+    emoji: '🏠',
+    title: 'When Family Feels Hard',
+    color: '#06D6A0',
+    body: `Fighting with people you love is one of the most confusing feelings there is. You can be furious at someone <em>and</em> love them at the same time. That's not strange — that's family.<br><br>The Stoics believed in something called <strong>Justice</strong>: treating every person with respect, even in conflict. Especially in conflict.`,
+    pill: 'Stoic Principle: Justice',
+    quote: '"Waste no more time arguing about what a good person should be. Be one."',
+    philosopher: 'Marcus Aurelius',
+    practice: [
+      'Before speaking: take 5 breaths. Seriously — it works.',
+      'Try to say what YOU feel, not what THEY did wrong.',
+      'Ask: "What does this person need right now?" — not just you.',
+      'Remember: the argument will pass. The relationship lasts.'
+    ]
+  },
+  alone: {
+    emoji: '🌧️',
+    title: 'When You Feel Left Out',
+    color: '#4CC9F0',
+    body: `Feeling invisible or left out is one of the most painful feelings a human can have. You are not imagining it — it is real and it matters. But here is something true: <strong>you are never as alone as you feel in that moment.</strong><br><br>The Stoics remind us: your worth is not decided by who includes you. It was never up to them.`,
+    pill: 'Stoic Principle: Inner Citadel',
+    quote: '"Never depend on the admiration of others. There is no strength in it."',
+    philosopher: 'Epictetus',
+    practice: [
+      'Write down 3 things that make you uniquely, wonderfully you.',
+      'Reach out to ONE person — a message, a call, anything.',
+      'Do one thing today that YOU love, just for yourself.',
+      'Remember: belonging comes from being yourself — not performing for others.'
+    ]
+  },
+  angry: {
+    emoji: '🔥',
+    title: 'When You Feel Really Angry',
+    color: '#FF6B6B',
+    body: `Anger is not a problem. Anger is a messenger. It tells you something matters to you, something feels unfair, something needs to change. The Stoics didn't say "don't be angry." They said: <strong>pause before you act on it.</strong><br><br>The pause is where your power lives.`,
+    pill: 'Stoic Principle: Temperance',
+    quote: '"The best revenge is to be unlike him who performed the injustice."',
+    philosopher: 'Marcus Aurelius',
+    practice: [
+      'STOP. Do not say or type anything for 60 seconds.',
+      'Go somewhere physical — walk, run, move your body.',
+      'Ask: "Is this anger about THIS moment — or about something older?"',
+      'When calm: express what you need. Anger heard is anger healed.'
+    ]
+  },
+  forgive: {
+    emoji: '🕊️',
+    title: 'When You Need to Forgive',
+    color: '#FF85A1',
+    body: `Forgiveness is one of the hardest — and most powerful — things a human being can do. Here is what the Stoics knew, and what experience confirms: <strong>forgiveness is not a gift to the person who hurt you. It is a gift to yourself.</strong><br><br>Carrying anger is like holding a hot coal. Forgiveness means putting it down.`,
+    pill: 'Stoic Principle: Forgiveness',
+    quote: '"How much more grievous are the consequences of anger than the causes of it."',
+    philosopher: 'Marcus Aurelius',
+    practice: [
+      'Acknowledge: "I was hurt. That was real."',
+      'Ask: "What would it feel like to put this down?"',
+      'Forgiveness does not mean trusting them again — it means freeing you.',
+      'Write a letter you never send. Say everything. Then let it go.'
+    ]
+  },
+  lost: {
+    emoji: '🌱',
+    title: 'When You Feel Lost',
+    color: '#C77DFF',
+    body: `Feeling lost — not knowing who you are or where you belong — is not a sign that something is wrong with you. It is a sign that you are <em>growing</em>. The Stoics believed that the purpose of a human life is to become more and more <strong>yourself</strong>.<br><br>You are not lost. You are becoming.`,
+    pill: 'Stoic Principle: Eudaimonia',
+    quote: '"He who knows others is wise; he who knows himself is enlightened."',
+    philosopher: 'Lao Tzu',
+    practice: [
+      'Write: "The things I love most in the world are..." — don\'t stop for 3 minutes.',
+      'Ask: "When do I feel most like ME?" That is your compass.',
+      'Being lost is the beginning of finding yourself. Trust the process.',
+      'Talk to someone you admire. Ask them when they figured themselves out. (Spoiler: still working on it! 😄)'
+    ]
+  }
+};
+
+function showResponse(key) {
+  const r = responses[key];
+  const html = `
+    <div class="response-hero animate-pop">
+      <span class="response-emoji pulse">${r.emoji}</span>
+      <h2 class="response-title">${r.title}</h2>
+      <p class="response-body">${r.body}</p>
+      <span class="wisdom-pill">${r.pill}</span>
+    </div>
+    <div class="stoic-box animate-slide delay-1">
+      <div class="stoic-label">📜 Stoic Wisdom</div>
+      <div class="stoic-quote">${r.quote}</div>
+      <div class="stoic-by">— ${r.philosopher}</div>
+    </div>
+    <div class="practice-box animate-slide delay-2">
+      <div class="practice-label">✅ Try This — Right Now</div>
+      <ul class="practice-steps">
+        ${r.practice.map((step, i) => `<li><span class="step-num">${i+1}</span>${step}</li>`).join('')}
+      </ul>
+    </div>
+    <div class="you-are-not-alone animate-slide delay-3">
+      <span>💛</span>
+      You are NOT alone with this feeling.<br>
+      Every human being has felt exactly this way.<br>
+      <strong>That's why wisdom exists — for moments like this one.</strong>
+    </div>
   `;
-  goTo('s-fdetail');
-}
-function playVid(key){
-  const t=document.getElementById('vt-'+key);
-  if(t)t.innerHTML='<div class="vid-coming-txt">🎬 Video coming soon!<br><br>This wisdom is already yours.<br>The film is being made. 🌿</div>';
+  document.getElementById('response-content').innerHTML = html;
+  goTo('screen-response');
 }
 </script>
+
 </body>
 </html>
