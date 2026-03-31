@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Monkey Mind</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0D0F14;
+  --s1:#161921;
+  --s2:#1E222E;
+  --s3:#262B3A;
+  --b:rgba(255,255,255,0.07);
+  --b2:rgba(255,255,255,0.13);
+  --b3:rgba(255,255,255,0.22);
+  --t:#F2F0FF;
+  --tm:#8890AA;
+  --th:#3D4460;
+  --orange:#FF7A2F;
+  --orange2:#FF9F5C;
+  --og-dim:rgba(255,122,47,0.15);
+  --blue:#4A90FF;
+  --teal:#00D4AA;
+  --red:#FF3D5A;
+  --red-dim:rgba(255,61,90,0.15);
+  --green:#2DD88A;
+  --purple:#A855F7;
+  --pill:999px;
+  --f:'Nunito',sans-serif;
+  --nb-h:72px;
+}
+html,body{height:100%;background:var(--bg);color:var(--t);font-family:var(--f);-webkit-font-smoothing:antialiased;overflow:hidden}
+.app{max-width:430px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;position:relative;overflow:hidden}
+
+/* ── SCREENS ── */
+.scr{display:none;flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:calc(var(--nb-h) + 10px);-webkit-overflow-scrolling:touch}
+.scr.on{display:block}
+
+/* ── BOTTOM NAV (Insight Timer style) ── */
+.nav{
+  display:flex;align-items:center;justify-content:space-around;
+  background:rgba(13,15,20,0.96);backdrop-filter:blur(20px);
+  border-top:0.5px solid var(--b2);
+  height:var(--nb-h);flex-shrink:0;position:relative;z-index:200;
+}
+.nb{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  gap:3px;padding:10px 0;background:none;border:none;cursor:pointer;
+  font-family:var(--f);transition:all .2s;
+}
+.nb .ni{font-size:22px;line-height:1;transition:transform .2s}
+.nb .nl{font-size:10px;font-weight:700;color:var(--th);letter-spacing:.05em;transition:color .2s}
+.nb.on .nl{color:var(--orange)}
+.nb.on .ni{transform:scale(1.15)}
+/* SOS center button */
+.nb-sos{
+  flex:0 0 72px;display:flex;flex-direction:column;align-items:center;
+  gap:3px;padding:0;background:none;border:none;cursor:pointer;
+  font-family:var(--f);position:relative;
+}
+.sos-orb{
+  width:56px;height:56px;border-radius:50%;
+  background:linear-gradient(135deg,#FF3D5A,#FF1A1A);
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;
+  box-shadow:0 0 20px rgba(255,61,90,0.5),0 4px 16px rgba(0,0,0,0.4);
+  transition:transform .15s,box-shadow .15s;
+  margin-top:-22px;border:3px solid var(--bg);
+}
+.nb-sos:active .sos-orb{transform:scale(.93);box-shadow:0 0 10px rgba(255,61,90,0.3)}
+.nb-sos .nl{font-size:10px;font-weight:700;color:var(--red);letter-spacing:.05em}
+
+/* ────────────────────────────
+   HOME SCREEN
+──────────────────────────── */
+.home-top{
+  position:relative;
+  background:linear-gradient(180deg,#1A0F2E 0%,#0D0F14 100%);
+  padding:20px 20px 0;
+  overflow:hidden;
+}
+.home-top::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 70% 0%,rgba(255,122,47,.18) 0%,transparent 65%);
+}
+.home-greeting-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;position:relative}
+.home-greeting{
+  font-size:13px;font-weight:700;color:var(--tm);
+  letter-spacing:.06em;text-transform:uppercase;
+}
+.home-title{font-size:26px;font-weight:900;color:var(--t);letter-spacing:-.5px;line-height:1.15;position:relative}
+.home-title span{color:var(--orange)}
+
+/* MONKEY */
+.monkey-wrap{position:relative;z-index:2}
+.monkey-svg{width:90px;height:90px;animation:monkeyBob 3s ease-in-out infinite}
+@keyframes monkeyBob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-6px) rotate(2deg)}}
+
+/* FEATURED ROW */
+.home-featured-label{font-size:11px;font-weight:800;color:var(--tm);letter-spacing:.1em;text-transform:uppercase;padding:20px 20px 12px}
+.h-scroll{display:flex;gap:12px;padding:0 20px 20px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.h-scroll::-webkit-scrollbar{display:none}
+.feat-card{
+  flex:0 0 160px;border-radius:16px;overflow:hidden;
+  position:relative;cursor:pointer;border:0.5px solid var(--b2);
+  aspect-ratio:3/4;
+}
+.feat-card img{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(.55);transition:filter .3s}
+.feat-card:hover img{filter:brightness(.7)}
+.feat-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.9) 0%,transparent 55%);display:flex;flex-direction:column;justify-content:flex-end;padding:12px 11px}
+.feat-badge{font-size:10px;font-weight:800;padding:3px 8px;border-radius:var(--pill);margin-bottom:6px;display:inline-block;letter-spacing:.05em;text-transform:uppercase;width:fit-content}
+.badge-learn{background:rgba(74,144,255,.25);color:#7BB3FF;border:1px solid rgba(74,144,255,.3)}
+.badge-prac{background:rgba(168,85,247,.25);color:#C084FC;border:1px solid rgba(168,85,247,.3)}
+.badge-feel{background:rgba(255,122,47,.25);color:var(--orange2);border:1px solid rgba(255,122,47,.3)}
+.feat-title{font-size:13px;font-weight:800;color:#fff;line-height:1.25}
+.feat-dur{font-size:11px;color:rgba(255,255,255,.5);margin-top:3px}
+
+/* MOOD STRIP */
+.mood-strip-label{font-size:11px;font-weight:800;color:var(--tm);letter-spacing:.1em;text-transform:uppercase;padding:0 20px 12px}
+.mood-strip{display:flex;gap:8px;padding:0 20px 20px;overflow-x:auto;scrollbar-width:none}
+.mood-strip::-webkit-scrollbar{display:none}
+.mc{flex:0 0 100px;border-radius:14px;overflow:hidden;position:relative;cursor:pointer;border:1.5px solid var(--b);aspect-ratio:3/4;transition:all .2s}
+.mc:active{transform:scale(.95)}
+.mc.on{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,122,47,.2)}
+.mc img{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(.5)}
+.mc-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.88) 0%,transparent 60%);display:flex;flex-direction:column;justify-content:flex-end;padding:10px 9px}
+.mc-e{font-size:20px;margin-bottom:4px}
+.mc-l{font-size:12px;font-weight:800;color:#fff;line-height:1.2}
+.mc-s{font-size:10px;color:rgba(255,255,255,.5);margin-top:2px}
+
+/* HOME QUICK ACTIONS */
+.qa-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:0 20px 24px}
+.qa{background:var(--s1);border:0.5px solid var(--b2);border-radius:14px;padding:14px 6px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all .18s}
+.qa:active{transform:scale(.95)}
+.qa-icon{font-size:24px}
+.qa-label{font-size:10.5px;font-weight:700;color:var(--tm);text-align:center;line-height:1.3}
+
+/* ────────────────────────────
+   SOS OVERLAY
+──────────────────────────── */
+.sos-overlay{
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(0,0,0,.88);backdrop-filter:blur(16px);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px;
+  animation:ovIn .3s ease;
+}
+.sos-overlay.on{display:flex}
+@keyframes ovIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.sos-monkey-big{width:100px;height:100px;margin-bottom:16px;animation:sosShake .4s ease infinite alternate}
+@keyframes sosShake{from{transform:rotate(-8deg) scale(1)}to{transform:rotate(8deg) scale(1.05)}}
+.sos-title{font-size:28px;font-weight:900;color:var(--t);letter-spacing:-.5px;margin-bottom:6px;text-align:center}
+.sos-sub{font-size:14px;color:var(--tm);text-align:center;margin-bottom:28px;line-height:1.5}
+.sos-options{display:flex;flex-direction:column;gap:12px;width:100%;max-width:340px}
+.sos-btn{
+  display:flex;align-items:center;gap:14px;
+  border-radius:18px;padding:18px 20px;cursor:pointer;
+  border:1.5px solid var(--b2);background:var(--s1);
+  transition:all .2s;width:100%;text-align:left;
+  font-family:var(--f);
+}
+.sos-btn:active{transform:scale(.97)}
+.sos-btn.metal{border-color:rgba(255,61,90,.4);background:rgba(255,61,90,.1)}
+.sos-btn.breath{border-color:rgba(0,212,170,.4);background:rgba(0,212,170,.08)}
+.sos-btn.speech{border-color:rgba(74,144,255,.4);background:rgba(74,144,255,.08)}
+.sos-btn-ico{font-size:32px;flex-shrink:0}
+.sos-btn-text{}
+.sos-btn-title{font-size:16px;font-weight:800;color:var(--t)}
+.sos-btn-desc{font-size:12px;color:var(--tm);margin-top:2px;line-height:1.4}
+.sos-close{margin-top:20px;font-size:13px;font-weight:700;color:var(--th);background:none;border:none;cursor:pointer;font-family:var(--f);padding:10px 20px}
+
+/* METAL PLAYER inside SOS */
+.metal-player{
+  width:100%;max-width:340px;border-radius:18px;padding:20px;
+  background:var(--s1);border:1.5px solid rgba(255,61,90,.4);
+  display:none;margin-top:12px;
+}
+.metal-player.on{display:block}
+.metal-title{font-size:15px;font-weight:800;color:var(--t);margin-bottom:4px}
+.metal-sub{font-size:12px;color:var(--tm);margin-bottom:14px}
+.metal-tracks{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.metal-track{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  background:var(--s2);border-radius:12px;cursor:pointer;border:0.5px solid var(--b);
+  transition:all .18s;
+}
+.metal-track.playing{border-color:var(--red);background:var(--red-dim)}
+.metal-track-ico{font-size:18px}
+.metal-track-name{flex:1;font-size:13px;font-weight:700;color:var(--t)}
+.metal-track-dur{font-size:11px;color:var(--tm)}
+.btn-metal-stop{width:100%;padding:10px;border-radius:12px;background:var(--red-dim);border:1px solid var(--red);color:var(--red);font-family:var(--f);font-size:13px;font-weight:700;cursor:pointer}
+
+/* BREATH in SOS */
+.sos-breath{width:100%;max-width:340px;display:none;margin-top:12px}
+.sos-breath.on{display:block}
+
+/* ────────────────────────────
+   POCITY SCREEN
+──────────────────────────── */
+.screen-hero{position:relative;height:180px;overflow:hidden}
+.screen-hero img{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(.35)}
+.screen-hero-copy{position:absolute;inset:0;padding:20px;display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(to bottom,transparent 20%,rgba(13,15,20,.97) 100%)}
+.sh-tag{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);margin-bottom:6px}
+.sh-title{font-size:26px;font-weight:900;color:#fff;letter-spacing:-.4px;line-height:1.1}
+.sh-sub{font-size:13px;color:rgba(255,255,255,.45);margin-top:4px}
+
+/* POCITY CARDS */
+.ec-wrap{padding:16px 14px 0}
+.ec-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+.ec{border-radius:18px;overflow:hidden;position:relative;cursor:pointer;border:1.5px solid var(--b);aspect-ratio:3/4;transition:all .22s}
+.ec:active{transform:scale(.96)}
+.ec.on{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,122,47,.2)}
+.ec img{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(.45);transition:filter .3s}
+.ec:hover img{filter:brightness(.55)}
+.ec-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.9) 0%,rgba(0,0,0,.05) 55%,transparent 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:14px 13px}
+.ec-icon{font-size:22px;margin-bottom:6px}
+.ec-name{font-size:14px;font-weight:800;color:#fff;line-height:1.2}
+.ec-desc{font-size:11.5px;color:rgba(255,255,255,.5);margin-top:3px;line-height:1.3}
+
+/* DETAIL */
+.detail{border:0.5px solid var(--b2);border-radius:20px;background:var(--s1);overflow:hidden;margin:0 14px 16px;display:none;animation:fu .22s ease}
+.detail.on{display:block}
+.d-photo{position:relative;height:140px;overflow:hidden}
+.d-photo img{width:100%;height:100%;object-fit:cover;filter:brightness(.45);display:block}
+.d-photo-copy{position:absolute;inset:0;padding:16px;display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(to top,rgba(0,0,0,.8),transparent)}
+.d-title{font-size:18px;font-weight:900;color:#fff;letter-spacing:-.2px}
+.d-sub{font-size:12px;color:rgba(255,255,255,.5);margin-top:3px}
+
+/* SUB TABS */
+.stabs{display:flex;border-top:0.5px solid var(--b);border-bottom:0.5px solid var(--b);background:var(--bg)}
+.st{flex:1;padding:12px 4px;font-size:11px;font-weight:800;color:var(--th);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:var(--f);transition:all .18s;letter-spacing:.04em;text-transform:uppercase}
+.st.on{color:var(--orange);border-bottom-color:var(--orange)}
+.sp{display:none;padding:16px}
+.sp.on{display:block}
+
+/* ACARD */
+.acard{border:0.5px solid var(--b);border-radius:14px;margin-bottom:10px;background:var(--s2);overflow:hidden}
+.acard img{width:100%;height:110px;object-fit:cover;display:block;filter:brightness(.6)}
+.acard-in{padding:14px}
+.acard-title{font-size:15px;font-weight:800;color:var(--t);margin-bottom:5px;letter-spacing:-.1px}
+.acard-body{font-size:13px;color:var(--tm);line-height:1.65;margin-bottom:13px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.btn-p{font-size:12.5px;font-weight:700;border:1px solid var(--b2);border-radius:var(--pill);padding:8px 15px;background:none;cursor:pointer;color:var(--t);font-family:var(--f);transition:all .15s}
+.btn-p:hover{background:var(--s3)}
+.btn-p.playing{border-color:var(--teal);color:var(--teal);background:rgba(0,212,170,.1)}
+
+/* BREATHING */
+.breath-wrap{display:flex;flex-direction:column;align-items:center;padding:26px 0 18px}
+.b-outer{width:150px;height:150px;border-radius:50%;border:1.5px solid var(--b2);display:flex;align-items:center;justify-content:center;transition:transform 4s ease-in-out,border-color .4s,box-shadow .4s;margin-bottom:22px}
+.b-outer.expand{transform:scale(1.3);border-color:var(--teal);box-shadow:0 0 30px rgba(0,212,170,.25)}
+.b-outer.hold{transform:scale(1.3);border-color:var(--blue);box-shadow:0 0 30px rgba(74,144,255,.25)}
+.b-outer.shrink{transform:scale(1);border-color:var(--orange);box-shadow:none}
+.b-inner{width:88px;height:88px;border-radius:50%;background:var(--s2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.b-ph{font-size:11px;font-weight:800;color:var(--tm);text-transform:uppercase;letter-spacing:.08em}
+.b-num{font-size:34px;font-weight:900;color:var(--t);line-height:1}
+.b-hint{font-size:13px;color:var(--tm);text-align:center;max-width:220px;margin-bottom:18px;line-height:1.55}
+.btn-start{font-size:15px;font-weight:800;border:none;border-radius:var(--pill);padding:12px 38px;background:linear-gradient(135deg,var(--orange),#FF5A1A);cursor:pointer;color:#fff;font-family:var(--f);box-shadow:0 4px 20px rgba(255,122,47,.4)}
+
+/* 5-4-3-2-1 */
+.game-intro{font-size:13.5px;color:var(--tm);margin-bottom:16px;line-height:1.65}
+.gs{border:0.5px solid var(--b);border-radius:14px;padding:13px;margin-bottom:10px;background:var(--s2)}
+.gs-n{font-size:11px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.gs-q{font-size:14px;font-weight:800;color:var(--t);margin-bottom:9px;letter-spacing:-.1px}
+.gs textarea{width:100%;border:0.5px solid var(--b2);border-radius:10px;padding:10px 12px;font-size:13px;background:var(--s1);color:var(--t);resize:none;font-family:var(--f);line-height:1.5}
+.gs textarea::placeholder{color:var(--th)}
+
+/* ────────────────────────────
+   UČENÍ SCREEN
+──────────────────────────── */
+.learn-hero{position:relative;height:200px;overflow:hidden}
+.learn-hero img{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(.3)}
+.learn-hero-copy{position:absolute;inset:0;padding:24px 20px;display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(to bottom,transparent 15%,rgba(13,15,20,.98) 100%)}
+.lh-tag{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:8px}
+.lh-title{font-size:28px;font-weight:900;color:#fff;letter-spacing:-.5px;line-height:1.1}
+.lh-sub{font-size:13px;color:rgba(255,255,255,.4);margin-top:5px}
+
+/* CATEGORY CHIPS */
+.chips-wrap{padding:16px 20px 0}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:0}
+.chip{padding:8px 16px;border:1px solid var(--b2);border-radius:var(--pill);font-size:13px;font-weight:700;background:var(--s1);cursor:pointer;color:var(--tm);font-family:var(--f);transition:all .18s}
+.chip.on{border-color:var(--blue);color:var(--blue);background:rgba(74,144,255,.12)}
+
+/* LEARN CARDS (Insight Timer list style) */
+.learn-list{padding:16px 14px 0}
+.learn-card{
+  display:flex;gap:14px;align-items:center;
+  padding:14px;border-radius:16px;margin-bottom:10px;
+  background:var(--s1);border:0.5px solid var(--b);
+  cursor:pointer;transition:all .18s;
+}
+.learn-card:active{transform:scale(.98)}
+.learn-thumb{
+  width:70px;height:70px;border-radius:12px;object-fit:cover;
+  flex-shrink:0;filter:brightness(.8);
+}
+.learn-info{flex:1;min-width:0}
+.learn-cat{font-size:10.5px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.learn-title{font-size:14px;font-weight:800;color:var(--t);line-height:1.3;margin-bottom:4px}
+.learn-meta{font-size:11.5px;color:var(--tm)}
+.learn-play{
+  width:42px;height:42px;border-radius:50%;
+  background:var(--s2);border:0.5px solid var(--b2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;cursor:pointer;transition:all .15s;
+}
+.learn-play:hover{background:var(--s3)}
+.learn-play.on{background:rgba(74,144,255,.2);border-color:var(--blue);color:var(--blue)}
+
+/* ────────────────────────────
+   PRAXE SCREEN
+──────────────────────────── */
+.prax-hero{position:relative;height:200px;overflow:hidden}
+.prax-hero img{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(.3)}
+.prax-hero-copy{position:absolute;inset:0;padding:24px 20px;display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(to bottom,transparent 15%,rgba(13,15,20,.98) 100%)}
+.ph-tag{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--purple);margin-bottom:8px}
+.ph-title{font-size:28px;font-weight:900;color:#fff;letter-spacing:-.5px;line-height:1.1}
+
+/* PRAXE SECTIONS */
+.prax-section{padding:20px 14px 0}
+.prax-section-title{font-size:11px;font-weight:800;color:var(--th);margin-bottom:12px;padding-bottom:10px;border-bottom:0.5px solid var(--b);text-transform:uppercase;letter-spacing:.08em}
+.prax-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:8px}
+.prax-card{
+  border-radius:16px;overflow:hidden;position:relative;
+  cursor:pointer;border:0.5px solid var(--b);aspect-ratio:4/3;
+  transition:all .2s;
+}
+.prax-card:active{transform:scale(.96)}
+.prax-card img{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(.45)}
+.prax-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.88) 0%,transparent 60%);display:flex;flex-direction:column;justify-content:flex-end;padding:12px}
+.prax-icon{font-size:20px;margin-bottom:4px}
+.prax-name{font-size:13px;font-weight:800;color:#fff;line-height:1.2}
+.prax-sub{font-size:11px;color:rgba(255,255,255,.5);margin-top:2px}
+
+/* DIARY */
+.diary-wrap{padding:0 14px 20px}
+.diary-box{background:var(--s1);border:0.5px solid var(--b2);border-radius:16px;padding:16px}
+.diary-date{font-size:11px;font-weight:700;color:var(--th);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em}
+.diary-input{width:100%;background:transparent;border:none;color:var(--t);font-family:var(--f);font-size:15px;line-height:1.7;resize:none;height:140px;outline:none}
+.diary-input::placeholder{color:var(--th)}
+.diary-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:10px;border-top:0.5px solid var(--b);padding-top:10px}
+.btn-diary-save{font-size:13px;font-weight:700;border:1px solid var(--orange);border-radius:var(--pill);padding:8px 18px;background:var(--og-dim);cursor:pointer;color:var(--orange);font-family:var(--f)}
+.diary-entries{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.diary-entry{background:var(--s2);border:0.5px solid var(--b);border-radius:12px;padding:12px 14px}
+.diary-entry-date{font-size:11px;color:var(--th);margin-bottom:4px;font-weight:700}
+.diary-entry-text{font-size:13.5px;color:var(--tm);line-height:1.6}
+
+/* ────────────────────────────
+   VOICE PANEL
+──────────────────────────── */
+.voice-panel{position:fixed;bottom:calc(var(--nb-h) + 10px);left:50%;transform:translateX(-50%);width:calc(100% - 28px);max-width:400px;background:var(--s1);border:0.5px solid var(--b2);border-radius:20px;padding:16px 18px;z-index:300;display:none;animation:slideUp .3s ease;box-shadow:0 -4px 40px rgba(0,0,0,.6)}
+.voice-panel.on{display:block}
+@keyframes slideUp{from{transform:translateX(-50%) translateY(20px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
+.vp-title{font-size:13px;font-weight:800;color:var(--t);margin-bottom:10px}
+.vp-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.vp-label{font-size:12px;color:var(--tm);width:50px;flex-shrink:0}
+.vp-select{flex:1;background:var(--s2);border:0.5px solid var(--b2);border-radius:10px;padding:8px 10px;color:var(--t);font-family:var(--f);font-size:13px}
+.vp-slider{flex:1;accent-color:var(--orange)}
+.vp-val{font-size:12px;color:var(--orange);width:28px;text-align:right}
+.btn-vp-test{font-size:12px;font-weight:700;border:1px solid var(--orange);border-radius:var(--pill);padding:6px 14px;background:var(--og-dim);cursor:pointer;color:var(--orange);font-family:var(--f)}
+.btn-vp-close{font-size:12px;font-weight:700;border:1px solid var(--b2);border-radius:var(--pill);padding:6px 14px;background:none;cursor:pointer;color:var(--tm);font-family:var(--f);margin-left:auto}
+
+/* MINI PLAYER */
+.mini-player{
+  position:fixed;bottom:var(--nb-h);left:0;right:0;
+  max-width:430px;margin:0 auto;
+  background:var(--s2);border-top:0.5px solid var(--b2);
+  padding:10px 16px;display:none;z-index:150;
+  align-items:center;gap:12px;
+}
+.mini-player.on{display:flex}
+.mp-img{width:40px;height:40px;border-radius:8px;object-fit:cover;flex-shrink:0}
+.mp-info{flex:1;min-width:0}
+.mp-title{font-size:13px;font-weight:800;color:var(--t);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mp-auth{font-size:11px;color:var(--tm)}
+.mp-controls{display:flex;gap:8px;align-items:center}
+.mp-btn{background:none;border:none;cursor:pointer;font-size:20px;color:var(--t);padding:4px;transition:transform .15s}
+.mp-btn:active{transform:scale(.88)}
+.mp-stop{font-size:14px;color:var(--tm)}
+
+/* PROGRESS BAR */
+.prog-bar{height:2px;background:var(--b);position:relative;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--orange),var(--orange2));width:0%;transition:width .5s linear}
+
+/* GENERAL */
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.section-pad{padding:0 20px}
+
+/* VOICE ICON in nav */
+.voice-btn{position:absolute;top:12px;right:14px;background:none;border:none;cursor:pointer;font-size:20px;color:var(--th);z-index:10}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ══════════ HOME ══════════ -->
+<div class="scr on" id="s-home">
+  <button class="voice-btn" onclick="toggleVoice()" title="Nastavení hlasu">🎙️</button>
+
+  <div class="home-top">
+    <div class="home-greeting-row">
+      <div>
+        <div class="home-greeting">Dobré ráno</div>
+        <div class="home-title">Monkey<br><span>Mind</span> 🐒</div>
+      </div>
+      <div class="monkey-wrap">
+        <!-- Monkey SVG -->
+        <svg class="monkey-svg" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Ears -->
+          <circle cx="18" cy="62" r="16" fill="#8B5E3C"/>
+          <circle cx="18" cy="62" r="10" fill="#E8926A"/>
+          <circle cx="102" cy="62" r="16" fill="#8B5E3C"/>
+          <circle cx="102" cy="62" r="10" fill="#E8926A"/>
+          <!-- Head -->
+          <ellipse cx="60" cy="58" rx="42" ry="40" fill="#A0693A"/>
+          <!-- Face -->
+          <ellipse cx="60" cy="72" rx="28" ry="20" fill="#E8926A"/>
+          <!-- Eyes whites -->
+          <ellipse cx="44" cy="52" rx="10" ry="11" fill="white"/>
+          <ellipse cx="76" cy="52" rx="10" ry="11" fill="white"/>
+          <!-- Irises -->
+          <circle cx="44" cy="54" r="7" fill="#3D2B1F"/>
+          <circle cx="76" cy="54" r="7" fill="#3D2B1F"/>
+          <!-- Pupils -->
+          <circle cx="45" cy="53" r="4" fill="#1A0F0A"/>
+          <circle cx="77" cy="53" r="4" fill="#1A0F0A"/>
+          <!-- Shine -->
+          <circle cx="47" cy="51" r="2" fill="white"/>
+          <circle cx="79" cy="51" r="2" fill="white"/>
+          <!-- Brows (worried/funny) -->
+          <path d="M35 42 Q44 36 53 42" stroke="#3D2B1F" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M67 42 Q76 36 85 42" stroke="#3D2B1F" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- Nose -->
+          <ellipse cx="60" cy="66" rx="7" ry="5" fill="#C47A4A"/>
+          <circle cx="57" cy="66" r="2" fill="#3D2B1F"/>
+          <circle cx="63" cy="66" r="2" fill="#3D2B1F"/>
+          <!-- Mouth smile -->
+          <path d="M48 78 Q60 90 72 78" stroke="#3D2B1F" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <!-- Head hair tuft -->
+          <path d="M38 22 Q50 10 60 18 Q70 10 82 22" stroke="#6B3F1E" stroke-width="6" stroke-linecap="round" fill="none"/>
+          <!-- Headphones hint (orange - monkey mind) -->
+          <path d="M20 55 Q20 18 60 18 Q100 18 100 55" stroke="#FF7A2F" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.6"/>
+          <rect x="14" y="52" width="12" height="18" rx="6" fill="#FF7A2F" opacity="0.8"/>
+          <rect x="94" y="52" width="12" height="18" rx="6" fill="#FF7A2F" opacity="0.8"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="home-featured-label">🔥 Dnes pro tebe</div>
+  <div class="h-scroll">
+    <div class="feat-card" onclick="openLearn('napoleon','https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80&fit=crop','Napoleon Hill','Mysli a zbohatni','Jak přemýšlíš, takový jsi. Mentální síla není dar — je to trénink.',15)">
+      <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80&fit=crop" alt=""/>
+      <div class="feat-ov">
+        <span class="feat-badge badge-learn">Učení</span>
+        <div class="feat-title">Napoleon Hill</div>
+        <div class="feat-dur">15 min · audio</div>
+      </div>
+    </div>
+    <div class="feat-card" onclick="openPrax('boxbreath')">
+      <img src="https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=300&q=80&fit=crop" alt=""/>
+      <div class="feat-ov">
+        <span class="feat-badge badge-prac">Praxe</span>
+        <div class="feat-title">Box Breathing</div>
+        <div class="feat-dur">5 min · dýchání</div>
+      </div>
+    </div>
+    <div class="feat-card" onclick="openLearn('stoic','https://images.unsplash.com/photo-1448375240586-882707db888b?w=600&q=80&fit=crop','Stoická moudrost','Kontroluj sám sebe','Marcus Aurelius věděl: jediná věc pod tvou kontrolou je jak reaguješ.',12)">
+      <img src="https://images.unsplash.com/photo-1448375240586-882707db888b?w=300&q=80&fit=crop" alt=""/>
+      <div class="feat-ov">
+        <span class="feat-badge badge-learn">Učení</span>
+        <div class="feat-title">Stoická moudrost</div>
+        <div class="feat-dur">12 min · audio</div>
+      </div>
+    </div>
+    <div class="feat-card" onclick="openPrax('metal')">
+      <img src="https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=300&q=80&fit=crop" alt=""/>
+      <div class="feat-ov">
+        <span class="feat-badge badge-prac">Praxe</span>
+        <div class="feat-title">Heavy Metal</div>
+        <div class="feat-dur">3 min · energie</div>
+      </div>
+    </div>
+    <div class="feat-card" onclick="showScr('s-pocity',document.querySelectorAll('.nb')[0])">
+      <img src="https://images.unsplash.com/photo-1476820865390-c52aeebb9891?w=300&q=80&fit=crop" alt=""/>
+      <div class="feat-ov">
+        <span class="feat-badge badge-feel">Pocity</span>
+        <div class="feat-title">Jak se cítíš?</div>
+        <div class="feat-dur">denní check-in</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mood-strip-label">Jak se teď cítíš?</div>
+  <div class="mood-strip">
+    <div class="mc" onclick="selMood(this,'Letím 🚀','Skvělá nálada! Zapiš co ji způsobilo — budeš to potřebovat jindy.')">
+      <img src="https://images.unsplash.com/photo-1464802686167-b939a6910659?w=200&q=75&fit=crop" alt=""/><div class="mc-ov"><span class="mc-e">🚀</span><div class="mc-l">Letím</div><div class="mc-s">Skvěle</div></div>
+    </div>
+    <div class="mc" onclick="selMood(this,'Ok ✌️','Celkem pohoda. Nic extra, nic špatně — to taky počítá.')">
+      <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&q=75&fit=crop" alt=""/><div class="mc-ov"><span class="mc-e">✌️</span><div class="mc-l">Ok</div><div class="mc-s">V pohodě</div></div>
+    </div>
+    <div class="mc" onclick="selMood(this,'Meh 😐','Tak nějak. Zkus jeden micro-krok — stačí opravdu malý.')">
+      <img src="https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=200&q=75&fit=crop" alt=""/><div class="mc-ov"><span class="mc-e">😐</span><div class="mc-l">Meh</div><div class="mc-s">Tak nějak</div></div>
+    </div>
+    <div class="mc" onclick="selMood(this,'Těžko 😔','To zní těžce. Záložka Pocity nebo SOS jsou tam pro tohle.')">
+      <img src="https://images.unsplash.com/photo-1476820865390-c52aeebb9891?w=200&q=75&fit=crop" alt=""/><div class="mc-ov"><span class="mc-e">😔</span><div class="mc-l">Těžko</div><div class="mc-s">Bolí to</div></div>
+    </div>
+    <div class="mc" onclick="selMood(this,'Dno 🌑','Fakt těžce. Zmáčkni SOS — je to červené tlačítko dole.')">
+      <img src="https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=200&q=75&fit=crop" alt=""/><div class="mc-ov"><span class="mc-e">🌑</span><div class="mc-l">Dno</div><div class="mc-s">Špatně</div></div>
+    </div>
+  </div>
+
+  <div class="section-pad" style="margin-bottom:12px">
+    <div class="home-featured-label" style="padding:0 0 12px">⚡ Rychlá praxe</div>
+    <div class="qa-row">
+      <div class="qa" onclick="openPrax('boxbreath')"><span class="qa-icon">🌬️</span><span class="qa-label">Box Breath</span></div>
+      <div class="qa" onclick="openPrax('wimhof')"><span class="qa-icon">❄️</span><span class="qa-label">Wim Hof</span></div>
+      <div class="qa" onclick="openPrax('metal')"><span class="qa-icon">🤘</span><span class="qa-label">Metal</span></div>
+      <div class="qa" onclick="openDiary()"><span class="qa-icon">📓</span><span class="qa-label">Deník</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ POCITY ══════════ -->
+<div class="scr" id="s-pocity">
+  <div class="screen-hero">
+    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80&fit=crop&crop=top" alt=""/>
+    <div class="screen-hero-copy">
+      <div class="sh-tag">Pocity</div>
+      <div class="sh-title">Co ti teď<br>běží hlavou?</div>
+      <div class="sh-sub">Vyber obraz — jdeme tam spolu.</div>
+    </div>
+  </div>
+  <div class="ec-wrap">
+    <div class="ec-grid">
+      <div class="ec" onclick="openEmo('anx',this)"><img src="https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=400&q=80&fit=crop" alt="" loading="lazy"/><div class="ec-ov"><span class="ec-icon">🌀</span><div class="ec-name">Úzkost</div><div class="ec-desc">Myšlenky jedou přesčas</div></div></div>
+      <div class="ec" onclick="openEmo('sad',this)"><img src="https://images.unsplash.com/photo-1501696461415-6bd6660c6742?w=400&q=80&fit=crop" alt="" loading="lazy"/><div class="ec-ov"><span class="ec-icon">🌧</span><div class="ec-name">Smutek</div><div class="ec-desc">Všechno je těžké</div></div></div>
+      <div class="ec" onclick="openEmo('ang',this)"><img src="https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=400&q=80&fit=crop" alt="" loading="lazy"/><div class="ec-ov"><span class="ec-icon">🔥</span><div class="ec-name">Vztek</div><div class="ec-desc">Jedu na nervy</div></div></div>
+      <div class="ec" onclick="openEmo('fear',this)"><img src="https://images.unsplash.com/photo-1448375240586-882707db888b?w=400&q=80&fit=crop" alt="" loading="lazy"/><div class="ec-ov"><span class="ec-icon">🫣</span><div class="ec-name">Strach</div><div class="ec-desc">Bojím se co přijde</div></div></div>
+      <div class="ec" onclick="openEmo('lone',this)"><img src="https://images.unsplash.com/photo-1476820865390-c52aeebb9891?w=400&q=80&fit=crop" alt="" loading="lazy"/><div class="ec-ov"><span class="ec-icon">🌿</span><div class="ec-name">Osamělost</div><div class="ec-desc">Připadám si neviditelný</div></div></div>
+      <div class="ec" onclick="openEmo('over',this)"><img src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=400&q=80&fit=crop" alt="" loading="lazy"/><div class="ec-ov"><span class="ec-icon">⚡</span><div class="ec-name">Přetížení</div><div class="ec-desc">Toho je moc</div></div></div>
+    </div>
+    <div class="detail" id="detail">
+      <div class="d-photo"><img id="d-img" src="" alt=""/><div class="d-photo-copy"><div class="d-title" id="d-title"></div><div class="d-sub" id="d-sub"></div></div></div>
+      <div class="stabs"><button class="st on" onclick="openTab('pomoc',this)">Co pomáhá</button><button class="st" onclick="openTab('dychani',this)">Dýchání</button><button class="st" onclick="openTab('hra',this)">5-4-3-2-1</button><button class="st" onclick="openTab('relax',this)">Relax</button></div>
+      <div class="sp on" id="t-pomoc"></div>
+      <div class="sp" id="t-dychani">
+        <div class="breath-wrap">
+          <div class="b-outer" id="br"><div class="b-inner"><span class="b-ph" id="bph">—</span><span class="b-num" id="bnum">4</span></div></div>
+          <div class="b-hint" id="bhint">Stiskni Start a dýchej se mnou.</div>
+          <button class="btn-start" id="bbtn" onclick="toggleBreath()">Start</button>
+        </div>
+      </div>
+      <div class="sp" id="t-hra">
+        <p class="game-intro">Technika 5-4-3-2-1 tě dostane zpátky do těla — z hlavy do přítomnosti.</p>
+        <div class="gs"><div class="gs-n">5 věcí</div><div class="gs-q">Co vidíš kolem?</div><textarea rows="2" placeholder="Cokoliv — stůl, okno, bota..."></textarea></div>
+        <div class="gs"><div class="gs-n">4 věci</div><div class="gs-q">Co fyzicky cítíš?</div><textarea rows="2" placeholder="Klávesnice, tričko..."></textarea></div>
+        <div class="gs"><div class="gs-n">3 věci</div><div class="gs-q">Co slyšíš?</div><textarea rows="2" placeholder="Zvuky kolem tebe..."></textarea></div>
+        <div class="gs"><div class="gs-n">2 věci</div><div class="gs-q">Co cítíš vůní?</div><textarea rows="1" placeholder="Nebo nic — to taky ok"></textarea></div>
+        <div class="gs"><div class="gs-n">1 věc</div><div class="gs-q">Jaká je chuť?</div><textarea rows="1" placeholder="Cokoliv"></textarea></div>
+      </div>
+      <div class="sp" id="t-relax"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ UČENÍ ══════════ -->
+<div class="scr" id="s-learn">
+  <div class="learn-hero">
+    <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&q=80&fit=crop" alt=""/>
+    <div class="learn-hero-copy">
+      <div class="lh-tag">📚 Učení</div>
+      <div class="lh-title">Tvoje<br>knihovna</div>
+      <div class="lh-sub">Vše jako audio. Jen poslouchej.</div>
+    </div>
+  </div>
+  <div class="chips-wrap">
+    <div class="chips" id="learn-chips">
+      <button class="chip on" onclick="filterLearn('vse',this)">Vše</button>
+      <button class="chip" onclick="filterLearn('mindset',this)">Mindset</button>
+      <button class="chip" onclick="filterLearn('vztahy',this)">Vztahy</button>
+      <button class="chip" onclick="filterLearn('telo',this)">Tělo</button>
+      <button class="chip" onclick="filterLearn('filosofie',this)">Filosofie</button>
+    </div>
+  </div>
+  <div class="learn-list" id="learn-list"></div>
+</div>
+
+<!-- ══════════ PRAXE ══════════ -->
+<div class="scr" id="s-prax">
+  <div class="prax-hero">
+    <img src="https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=800&q=80&fit=crop" alt=""/>
+    <div class="prax-hero-copy">
+      <div class="ph-tag">🎯 Praxe</div>
+      <div class="ph-title">Nástroje<br>pro každý den</div>
+    </div>
+  </div>
+
+  <div class="prax-section">
+    <div class="prax-section-title">Dýchání</div>
+    <div class="prax-grid">
+      <div class="prax-card" onclick="openPrax('boxbreath')"><img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80&fit=crop" alt="" loading="lazy"/><div class="prax-ov"><span class="prax-icon">🟦</span><div class="prax-name">Box Breathing</div><div class="prax-sub">4-4-4-4 · klid</div></div></div>
+      <div class="prax-card" onclick="openPrax('wimhof')"><img src="https://images.unsplash.com/photo-1468276311594-df7cb65d8df6?w=400&q=80&fit=crop" alt="" loading="lazy"/><div class="prax-ov"><span class="prax-icon">❄️</span><div class="prax-name">Wim Hof</div><div class="prax-sub">energie · reset</div></div></div>
+      <div class="prax-card" onclick="openPrax('sleep')"><img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?w=400&q=80&fit=crop" alt="" loading="lazy"/><div class="prax-ov"><span class="prax-icon">🌙</span><div class="prax-name">Spánkový dech</div><div class="prax-sub">4-7-8 · usnutí</div></div></div>
+      <div class="prax-card" onclick="openPrax('quick')"><img src="https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=400&q=80&fit=crop" alt="" loading="lazy"/><div class="prax-ov"><span class="prax-icon">⚡</span><div class="prax-name">Rychlý reset</div><div class="prax-sub">60 sec · kdekoliv</div></div></div>
+    </div>
+  </div>
+
+  <div class="prax-section">
+    <div class="prax-section-title">Hudba &amp; zvuky</div>
+    <div class="prax-grid">
+      <div class="prax-card" onclick="openPrax('metal')"><img src="https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=400&q=80&fit=crop" alt="" loading="lazy"/><div class="prax-ov"><span class="prax-icon">🤘</span><div class="prax-name">Heavy Metal</div><div class="prax-sub">výboj energie</div></div></div>
+      <div class="prax-card" onclick="openPrax('classic')"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80&fit=crop" alt="" loading="lazy"/><div class="prax-ov"><span class="prax-icon">🎻</span><div class="prax-name">Klasika</div><div class="prax-sub">fokus · učení</div></div></div>
+      <div class="prax-card" onclick="openPrax('dramatic')"><img src="https://images.unsplash.com/photo-1448375240586-882707db888b?w=400&q=80&fit=crop" alt="" loading="lazy"/><div class="prax-ov"><span class="prax-icon">🎬</span><div class="prax-name">Epická hudba</div><div class="prax-sub">motivace · síla</div></div></div>
+      <div class="prax-card" onclick="openPrax('nature')"><img src="https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400&q=80&fit=crop" alt="" loading="lazy"/><div class="prax-ov"><span class="prax-icon">🌊</span><div class="prax-name">Příroda</div><div class="prax-sub">klid · relax</div></div></div>
+    </div>
+  </div>
+
+  <div class="prax-section">
+    <div class="prax-section-title">Meditace</div>
+    <div class="prax-grid">
+      <div class="prax-card" onclick="openPrax('nidra')"><img src="https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?w=400&q=80&fit=crop" alt="" loading="lazy"/><div class="prax-ov"><span class="prax-icon">🧘</span><div class="prax-name">Yoga Nidra</div><div class="prax-sub">hluboký relax</div></div></div>
+      <div class="prax-card" onclick="openPrax('visual')"><img src="https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400&q=80&fit=crop" alt="" loading="lazy"/><div class="prax-ov"><span class="prax-icon">🌌</span><div class="prax-name">Vizualizace</div><div class="prax-sub">cíle · budoucnost</div></div></div>
+      <div class="prax-card" onclick="openPrax('sleepmed')"><img src="https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=400&q=80&fit=crop" alt="" loading="lazy"/><div class="prax-ov"><span class="prax-icon">💤</span><div class="prax-name">Spánková med.</div><div class="prax-sub">usnutí do 10 min</div></div></div>
+      <div class="prax-card" onclick="openPrax('body')"><img src="https://images.unsplash.com/photo-1519311965067-36d3e5f33d39?w=400&q=80&fit=crop" alt="" loading="lazy"/><div class="prax-ov"><span class="prax-icon">✨</span><div class="prax-name">Body Scan</div><div class="prax-sub">uvolnění těla</div></div></div>
+    </div>
+  </div>
+
+  <div class="prax-section">
+    <div class="prax-section-title">Deník</div>
+    <div class="diary-wrap">
+      <div class="diary-box">
+        <div class="diary-date" id="diary-date"></div>
+        <textarea class="diary-input" id="diary-input" placeholder="Co ti dnes leží na srdci? Žádný správný nebo špatný zápis — jen piš..."></textarea>
+        <div class="diary-footer">
+          <button class="btn-diary-save" onclick="saveDiary()">Uložit →</button>
+        </div>
+      </div>
+      <div class="diary-entries" id="diary-entries"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SOS OVERLAY ══════════ -->
+<div class="sos-overlay" id="sos-ov">
+  <svg class="sos-monkey-big" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="18" cy="62" r="16" fill="#8B5E3C"/><circle cx="18" cy="62" r="10" fill="#E8926A"/>
+    <circle cx="102" cy="62" r="16" fill="#8B5E3C"/><circle cx="102" cy="62" r="10" fill="#E8926A"/>
+    <ellipse cx="60" cy="58" rx="42" ry="40" fill="#A0693A"/>
+    <ellipse cx="60" cy="72" rx="28" ry="20" fill="#E8926A"/>
+    <ellipse cx="44" cy="52" rx="10" ry="11" fill="white"/><ellipse cx="76" cy="52" rx="10" ry="11" fill="white"/>
+    <circle cx="44" cy="54" r="7" fill="#3D2B1F"/><circle cx="76" cy="54" r="7" fill="#3D2B1F"/>
+    <circle cx="45" cy="53" r="4" fill="#1A0F0A"/><circle cx="77" cy="53" r="4" fill="#1A0F0A"/>
+    <circle cx="47" cy="51" r="2" fill="white"/><circle cx="79" cy="51" r="2" fill="white"/>
+    <!-- Worried brows -->
+    <path d="M35 40 Q44 46 53 40" stroke="#3D2B1F" stroke-width="3" stroke-linecap="round"/>
+    <path d="M67 40 Q76 46 85 40" stroke="#3D2B1F" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="60" cy="66" rx="7" ry="5" fill="#C47A4A"/>
+    <circle cx="57" cy="66" r="2" fill="#3D2B1F"/><circle cx="63" cy="66" r="2" fill="#3D2B1F"/>
+    <path d="M48 82 Q60 74 72 82" stroke="#3D2B1F" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    <!-- Hands on head -->
+    <path d="M10 35 Q25 20 38 32" stroke="#8B5E3C" stroke-width="8" stroke-linecap="round" fill="none"/>
+    <path d="M82 32 Q95 20 110 35" stroke="#8B5E3C" stroke-width="8" stroke-linecap="round" fill="none"/>
+  </svg>
+  <div class="sos-title">Monkey Mind SOS</div>
+  <div class="sos-sub">Co teď potřebuješ?<br>Vyber — jdeme na to.</div>
+
+  <div class="sos-options">
+    <button class="sos-btn metal" onclick="sosMetal()">
+      <span class="sos-btn-ico">🤘</span>
+      <div class="sos-btn-text">
+        <div class="sos-btn-title">Vypusť to — Heavy Metal</div>
+        <div class="sos-btn-desc">Testosteron potřebuje výboj. Distortion, basy, energie.</div>
+      </div>
+    </button>
+    <button class="sos-btn breath" onclick="sosBreath()">
+      <span class="sos-btn-ico">🌬️</span>
+      <div class="sos-btn-text">
+        <div class="sos-btn-title">Zklidni se — Box Breathing</div>
+        <div class="sos-btn-desc">4-4-4-4. Nervák resetuješ za 2 minuty.</div>
+      </div>
+    </button>
+    <button class="sos-btn speech" onclick="sosSpeech()">
+      <span class="sos-btn-ico">🎤</span>
+      <div class="sos-btn-text">
+        <div class="sos-btn-title">Nakopni se — Motivační řeč</div>
+        <div class="sos-btn-desc">Hlas přímo do uší. Vyber si co potřebuješ slyšet.</div>
+      </div>
+    </button>
+  </div>
+
+  <!-- METAL player panel -->
+  <div class="metal-player" id="metal-panel">
+    <div class="metal-title">🤘 Heavy Energy</div>
+    <div class="metal-sub">Zvuky generované přímo v appce — žádné stahování.</div>
+    <div class="metal-tracks" id="metal-tracks">
+      <div class="metal-track" onclick="playMetal(this,'Rage','sawtooth',80,3)"><span class="metal-track-ico">🔴</span><span class="metal-track-name">RAGE</span><span class="metal-track-dur">30s</span></div>
+      <div class="metal-track" onclick="playMetal(this,'Drop Riff','square',60,2.5)"><span class="metal-track-ico">🟠</span><span class="metal-track-name">DROP RIFF</span><span class="metal-track-dur">30s</span></div>
+      <div class="metal-track" onclick="playMetal(this,'War Drums','sine',40,1.5)"><span class="metal-track-ico">🟡</span><span class="metal-track-name">WAR DRUMS</span><span class="metal-track-dur">30s</span></div>
+    </div>
+    <button class="btn-metal-stop" onclick="stopMetal()">■ Stop</button>
+  </div>
+
+  <!-- SPEECH panel -->
+  <div id="speech-panel" style="display:none;width:100%;max-width:340px;margin-top:12px">
+    <div style="display:flex;flex-direction:column;gap:8px" id="speech-list"></div>
+  </div>
+
+  <!-- SOS BREATH inline -->
+  <div id="sos-breath-panel" style="display:none;width:100%;max-width:340px;margin-top:12px">
+    <div style="display:flex;flex-direction:column;align-items:center;padding:16px 0">
+      <div class="b-outer" id="sb-ring" style="width:130px;height:130px">
+        <div class="b-inner" style="width:76px;height:76px">
+          <span class="b-ph" id="sb-ph">—</span>
+          <span class="b-num" id="sb-num" style="font-size:28px">4</span>
+        </div>
+      </div>
+      <div class="b-hint" id="sb-hint" style="font-size:13px">Stiskni Start.</div>
+      <button class="btn-start" id="sb-btn" onclick="toggleSOSBreath()" style="font-size:14px;padding:10px 30px">Start</button>
+    </div>
+  </div>
+
+  <button class="sos-close" onclick="closeSOS()">✕ Zavřít</button>
+</div>
+
+<!-- VOICE PANEL -->
+<div class="voice-panel" id="voice-panel">
+  <div class="vp-title">🎙️ Nastavení hlasu</div>
+  <div class="vp-row">
+    <span class="vp-label">Hlas</span>
+    <select class="vp-select" id="voice-sel" onchange="saveVoice()"></select>
+  </div>
+  <div class="vp-row">
+    <span class="vp-label">Rychlost</span>
+    <input type="range" class="vp-slider" id="voice-rate" min="0.5" max="1.5" step="0.05" value="0.87" oninput="document.getElementById('rate-val').textContent=this.value;saveVoice()"/>
+    <span class="vp-val" id="rate-val">0.87</span>
+  </div>
+  <div class="vp-row">
+    <span class="vp-label">Výška</span>
+    <input type="range" class="vp-slider" id="voice-pitch" min="0.5" max="2" step="0.05" value="1" oninput="document.getElementById('pitch-val').textContent=this.value;saveVoice()"/>
+    <span class="vp-val" id="pitch-val">1.0</span>
+  </div>
+  <div class="vp-row" style="justify-content:flex-end;gap:8px;margin-top:4px">
+    <button class="btn-vp-test" onclick="testVoice()">Test hlasu</button>
+    <button class="btn-vp-close" onclick="toggleVoice()">Hotovo</button>
+  </div>
+</div>
+
+<!-- MINI PLAYER -->
+<div class="mini-player" id="mini-player">
+  <img class="mp-img" id="mp-img" src="" alt=""/>
+  <div class="mp-info">
+    <div class="mp-title" id="mp-title">—</div>
+    <div class="mp-auth" id="mp-auth">Monkey Mind</div>
+  </div>
+  <div class="mp-controls">
+    <button class="mp-btn" onclick="stopAll()">⏹</button>
+  </div>
+</div>
+<div class="prog-bar"><div class="prog-fill" id="prog"></div></div>
+
+<!-- BOTTOM NAV -->
+<nav class="nav">
+  <button class="nb on" onclick="showScr('s-pocity',this)"><span class="ni">💭</span><span class="nl">Pocity</span></button>
+  <button class="nb" onclick="showScr('s-learn',this)"><span class="ni">📚</span><span class="nl">Učení</span></button>
+  <button class="nb-sos" onclick="openSOS()">
+    <div class="sos-orb">🆘</div>
+    <span class="nl">SOS</span>
+  </button>
+  <button class="nb" onclick="showScr('s-prax',this)"><span class="ni">🎯</span><span class="nl">Praxe</span></button>
+  <button class="nb" onclick="showScr('s-home',this)"><span class="ni">🏠</span><span class="nl">Doma</span></button>
+</nav>
+
+</div><!-- /app -->
+<script>
+/* ─── GLOBAL STATE ─── */
+var voiceConf={voice:null,rate:.87,pitch:1.0};
+var audioCtx=null,metalNodes=[],breathOn=false,sosBreathOn=false,bIdx=0,bTick=null,sbIdx=0,sbTick=null;
+var progInt=null,progVal=0,currentTTS=null;
+var diaryEntries=[];
+
+/* ─── INIT ─── */
+window.addEventListener('load',function(){
+  loadVoices();
+  buildLearnList();
+  var now=new Date();
+  document.getElementById('diary-date').textContent=now.toLocaleDateString('cs-CZ',{weekday:'long',day:'numeric',month:'long'});
+  // start on home
+  showScrById('s-home');
+  document.querySelectorAll('.nb')[4].classList.add('on');
+});
+window.speechSynthesis.onvoiceschanged=loadVoices;
+
+/* ─── NAV ─── */
+function showScr(id,btn){
+  document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on')});
+  document.querySelectorAll('.nb').forEach(function(b){b.classList.remove('on')});
+  document.getElementById(id).classList.add('on');
+  if(btn)btn.classList.add('on');
+}
+function showScrById(id){document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on')});document.getElementById(id).classList.add('on')}
+
+/* ─── MOOD ─── */
+function selMood(card,label,msg){
+  document.querySelectorAll('.mc').forEach(function(c){c.classList.remove('on')});
+  card.classList.add('on');
+  speakText(msg);
+}
+
+/* ─── VOICE ─── */
+function loadVoices(){
+  var voices=window.speechSynthesis.getVoices();
+  var sel=document.getElementById('voice-sel');
+  sel.innerHTML='';
+  var cs=voices.filter(function(v){return v.lang.startsWith('cs')});
+  var rest=voices.filter(function(v){return!v.lang.startsWith('cs')});
+  var all=cs.concat(rest);
+  if(!all.length)all=voices;
+  all.forEach(function(v,i){
+    var opt=document.createElement('option');
+    opt.value=i;
+    opt.textContent=(v.lang.startsWith('cs')?'🇨🇿 ':'')+v.name+' ('+v.lang+')';
+    sel.appendChild(opt);
+  });
+  // auto-select first Czech
+  if(cs.length){voiceConf.voice=cs[0];sel.value=voices.indexOf(cs[0])}
+  else if(all.length){voiceConf.voice=all[0];sel.value=0}
+}
+function saveVoice(){
+  var voices=window.speechSynthesis.getVoices();
+  var idx=parseInt(document.getElementById('voice-sel').value);
+  if(voices[idx])voiceConf.voice=voices[idx];
+  voiceConf.rate=parseFloat(document.getElementById('voice-rate').value);
+  voiceConf.pitch=parseFloat(document.getElementById('voice-pitch').value);
+}
+function testVoice(){speakText('Ahoj! Toto je testovací hlas pro Monkey Mind aplikaci.')}
+function toggleVoice(){document.getElementById('voice-panel').classList.toggle('on')}
+
+function speakText(text){
+  window.speechSynthesis.cancel();
+  var u=new SpeechSynthesisUtterance(text);
+  if(voiceConf.voice)u.voice=voiceConf.voice;
+  u.lang=voiceConf.voice&&voiceConf.voice.lang?voiceConf.voice.lang:'cs-CZ';
+  u.rate=voiceConf.rate;u.pitch=voiceConf.pitch;
+  window.speechSynthesis.speak(u);
+  currentTTS=u;
+  return u;
+}
+
+/* ─── MINI PLAYER ─── */
+function showMini(title,auth,imgSrc){
+  document.getElementById('mp-title').textContent=title;
+  document.getElementById('mp-auth').textContent=auth||'Monkey Mind';
+  document.getElementById('mp-img').src=imgSrc||'';
+  document.getElementById('mini-player').classList.add('on');
+  progVal=0;clearInterval(progInt);
+  progInt=setInterval(function(){progVal=Math.min(progVal+.4,100);document.getElementById('prog').style.width=progVal+'%';if(progVal>=100)clearInterval(progInt)},200);
+}
+function stopAll(){
+  window.speechSynthesis.cancel();
+  stopMetal();
+  document.getElementById('mini-player').classList.remove('on');
+  clearInterval(progInt);
+  document.getElementById('prog').style.width='0%';
+}
+
+/* ─── SOS ─── */
+function openSOS(){document.getElementById('sos-ov').classList.add('on');document.getElementById('metal-panel').classList.remove('on');document.getElementById('speech-panel').style.display='none';document.getElementById('sos-breath-panel').style.display='none'}
+function closeSOS(){document.getElementById('sos-ov').classList.remove('on');stopMetal();if(sosBreathOn)stopSOSBreath()}
+
+function sosMetal(){
+  document.getElementById('metal-panel').classList.add('on');
+  document.getElementById('speech-panel').style.display='none';
+  document.getElementById('sos-breath-panel').style.display='none';
+}
+function sosBreath(){
+  document.getElementById('sos-breath-panel').style.display='block';
+  document.getElementById('metal-panel').classList.remove('on');
+  document.getElementById('speech-panel').style.display='none';
+}
+
+var SPEECHES=[
+  {title:'Ty to zvládneš',text:'Poslouchej mě. Tohle co teď cítíš je skutečné. Ale nejsi to, co cítíš. Jsi ten, kdo to zvládne překonat. Každá velká osobnost v historii prošla momentem, kdy chtěla vzdát. A nevzdala. Ty taky ne. Dýchej. Jeden krok. Jen jeden.'},
+  {title:'Tvůj mozek není tvůj nepřítel',text:'Tvůj mozek ve dvanácti až dvaceti letech prochází největší přestavbou od dětství. Hormony, emoce, chaos — to je biologie, ne slabost. Bojuješ jako profesionál ve vybavení amatéra. Buď na sebe mírnější.'},
+  {title:'Marcus Aurelius',text:'Zbavíš se zbytečného utrpení, jakmile si uvědomíš, že spočívá jedině v domněnce. Nikdo tě nemůže zranit beze tvého svolení. Máš sílu, i když ji teď necítíš.'},
+  {title:'Ty nestojíš za nic?',text:'Lež. Naprostá lež. Žádný člověk na světě nemá přístup k tvým myšlenkám, tvým snům, tvé jedinečné perspektivě. Jsi originál. Verzí tebe je jen jedna. Chceš ji zahodit kvůli momentu, který za tři roky budeš sotva pamatovat?'},
+];
+function sosSpeech(){
+  document.getElementById('speech-panel').style.display='block';
+  document.getElementById('metal-panel').classList.remove('on');
+  document.getElementById('sos-breath-panel').style.display='none';
+  var sl=document.getElementById('speech-list');
+  sl.innerHTML=SPEECHES.map(function(s,i){
+    var es=s.text.replace(/'/g,'&#39;');
+    return'<button onclick="playSpeech('+i+')" style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(74,144,255,0.08);border:1px solid rgba(74,144,255,0.25);border-radius:14px;cursor:pointer;font-family:var(--f);text-align:left;width:100%;color:var(--t);transition:all .18s">'
+      +'<span style="font-size:22px">🎤</span>'
+      +'<div><div style="font-size:13px;font-weight:800;color:var(--t)">'+s.title+'</div><div style="font-size:11px;color:var(--tm);margin-top:2px">Tap → přehrát</div></div>'
+      +'</button>';
+  }).join('');
+}
+function playSpeech(i){
+  var s=SPEECHES[i];
+  speakText(s.text);
+  showMini(s.title,'Motivační řeč','');
+}
+
+/* ─── METAL Web Audio ─── */
+function getAudioCtx(){if(!audioCtx||audioCtx.state==='closed')audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx}
+function stopMetal(){metalNodes.forEach(function(n){try{n.stop()}catch(e){}});metalNodes=[];document.querySelectorAll('.metal-track').forEach(function(t){t.classList.remove('playing')})}
+
+function makeDistortion(ctx,amount){
+  var ws=ctx.createWaveShaper();
+  var n=256,curve=new Float32Array(n);
+  for(var i=0;i<n;i++){var x=i*2/n-1;curve[i]=(Math.PI+amount)*x/(Math.PI+amount*Math.abs(x));}
+  ws.curve=curve;ws.oversample='4x';return ws;
+}
+
+function playMetal(el,name,type,freq,distAmt){
+  stopMetal();
+  document.querySelectorAll('.metal-track').forEach(function(t){t.classList.remove('playing')});
+  el.classList.add('playing');
+  try{
+    var ctx=getAudioCtx();
+    // Main riff oscillator
+    var osc=ctx.createOscillator();osc.type=type;osc.frequency.setValueAtTime(freq,ctx.currentTime);
+    // Distortion
+    var dist=makeDistortion(ctx,distAmt*100);
+    // Low-pass filter
+    var lpf=ctx.createBiquadFilter();lpf.type='lowpass';lpf.frequency.setValueAtTime(800,ctx.currentTime);
+    // Gain
+    var gain=ctx.createGain();gain.gain.setValueAtTime(0.4,ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0,ctx.currentTime+28);
+    // Rhythm LFO
+    var lfo=ctx.createOscillator();lfo.type='square';lfo.frequency.setValueAtTime(8,ctx.currentTime);
+    var lfoGain=ctx.createGain();lfoGain.gain.setValueAtTime(0.3,ctx.currentTime);
+    lfo.connect(lfoGain);lfoGain.connect(gain.gain);
+    // Low drum
+    var drum=ctx.createOscillator();drum.type='sine';drum.frequency.setValueAtTime(60,ctx.currentTime);
+    drum.frequency.exponentialRampToValueAtTime(30,ctx.currentTime+.08);
+    var drumGain=ctx.createGain();drumGain.gain.setValueAtTime(.6,ctx.currentTime);drumGain.gain.exponentialRampToValueAtTime(.01,ctx.currentTime+.15);
+    // Repeat drum every .5s
+    for(var t2=0;t2<28;t2+=.5){
+      var d2=ctx.createOscillator();d2.type='sine';d2.frequency.setValueAtTime(60,ctx.currentTime+t2);d2.frequency.exponentialRampToValueAtTime(30,ctx.currentTime+t2+.08);
+      var dg2=ctx.createGain();dg2.gain.setValueAtTime(.5,ctx.currentTime+t2);dg2.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+t2+.18);
+      d2.connect(dg2);dg2.connect(ctx.destination);d2.start(ctx.currentTime+t2);d2.stop(ctx.currentTime+t2+.2);metalNodes.push(d2);
+    }
+    osc.connect(dist);dist.connect(lpf);lpf.connect(gain);gain.connect(ctx.destination);
+    osc.start();osc.stop(ctx.currentTime+30);lfo.start();lfo.stop(ctx.currentTime+30);
+    metalNodes.push(osc,lfo);
+    showMini(name,'Heavy Energy','https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=200&q=70');
+  }catch(e){console.warn('WebAudio error:',e)}
+}
+
+/* ─── BOX BREATHING ─── */
+var BP=[{l:'Nádech',s:4,c:'expand',h:'Pomalu se nadechni nosem.'},{l:'Zadrž',s:4,c:'hold',h:'Zadrž dech.'},{l:'Výdech',s:4,c:'shrink',h:'Pomalu vydechni ústy.'},{l:'Zadrž',s:4,c:'',h:'Krátká pauza.'}];
+function toggleBreath(){breathOn?stopBreath():startBreath()}
+function startBreath(){breathOn=true;bIdx=0;document.getElementById('bbtn').textContent='Stop';runBP()}
+function runBP(){
+  if(!breathOn)return;
+  var p=BP[bIdx%BP.length];
+  document.getElementById('br').className='b-outer '+p.c;
+  document.getElementById('bph').textContent=p.l;document.getElementById('bhint').textContent=p.h;
+  var s=p.s;document.getElementById('bnum').textContent=s;
+  clearInterval(bTick);bTick=setInterval(function(){s--;document.getElementById('bnum').textContent=Math.max(0,s);if(s<=0){clearInterval(bTick);if(breathOn){bIdx++;runBP()}}},1000);
+}
+function stopBreath(){breathOn=false;clearInterval(bTick);document.getElementById('br').className='b-outer';document.getElementById('bph').textContent='—';document.getElementById('bnum').textContent='4';document.getElementById('bhint').textContent='Stiskni Start a dýchej se mnou.';document.getElementById('bbtn').textContent='Start'}
+
+/* SOS breath (separate instance) */
+function toggleSOSBreath(){sosBreathOn?stopSOSBreath():startSOSBreath()}
+function startSOSBreath(){sosBreathOn=true;sbIdx=0;document.getElementById('sb-btn').textContent='Stop';runSBP()}
+function runSBP(){
+  if(!sosBreathOn)return;
+  var p=BP[sbIdx%BP.length];
+  document.getElementById('sb-ring').className='b-outer '+p.c;
+  document.getElementById('sb-ph').textContent=p.l;document.getElementById('sb-hint').textContent=p.h;
+  var s=p.s;document.getElementById('sb-num').textContent=s;
+  clearInterval(sbTick);sbTick=setInterval(function(){s--;document.getElementById('sb-num').textContent=Math.max(0,s);if(s<=0){clearInterval(sbTick);if(sosBreathOn){sbIdx++;runSBP()}}},1000);
+}
+function stopSOSBreath(){sosBreathOn=false;clearInterval(sbTick);document.getElementById('sb-ring').className='b-outer';document.getElementById('sb-ph').textContent='—';document.getElementById('sb-num').textContent='4';document.getElementById('sb-hint').textContent='Stiskni Start.';document.getElementById('sb-btn').textContent='Start'}
+
+/* ─── POCITY ─── */
+var ED={
+  anx:{title:'Úzkost',sub:'Myšlenky jedou přesčas',photo:'https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=700&q=80&fit=crop',
+    pomoc:[{t:'Myšlenka ≠ pravda',b:'Odděl fakta od katastrofické věty. Co je jistě pravda a co je jen nejhorší možný film v hlavě?',a:'Odděl fakta od katastrofické věty. Co je jistě pravda a co je jen nejhorší možný film v hlavě?',p:'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=500&q=70'},
+      {t:'Zkrať horizont',b:'Neřeš celý týden. Jen příštích deset minut. Jeden konkrétní krok, který teď zvládneš.',a:'Neřeš celý týden. Jen příštích deset minut. Jeden konkrétní krok, který teď zvládneš.',p:'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=500&q=70'}],
+    relax:[{t:'Body scan',b:'Zavři oči. Začni u chodidel — teplá nebo studená? Posunuj pozornost pomalu nahoru. Jen pozoruj.',a:'Zavři oči. Začni u chodidel. Teplá nebo studená? Posunuj pozornost pomalu nahoru. Jen pozoruj.',p:'https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=500&q=70'}]},
+  sad:{title:'Smutek',sub:'Všechno je těžké',photo:'https://images.unsplash.com/photo-1501696461415-6bd6660c6742?w=700&q=80&fit=crop',
+    pomoc:[{t:'Pojmenuj to',b:'Smutek roste když ho ignoruješ. Zkus: „Teď je mi špatně, protože…" — nech větu dojít na konec.',a:'Smutek roste když ho ignoruješ. Zkus dokončit větu: Teď je mi špatně, protože...',p:'https://images.unsplash.com/photo-1501696461415-6bd6660c6742?w=500&q=70'},
+      {t:'Jeden micro-krok',b:'Nulová energie? Jeden krok stačí: šálek čaje, tři minuty venku, jedna zpráva kamarádovi.',a:'Jeden krok stačí. Šálek čaje, tři minuty venku, jedna zpráva kamarádovi.',p:'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=500&q=70'}],
+    relax:[{t:'Bezpečné místo',b:'Zavři oči. Představ si místo kde ti je dobře — reálné i vymyšlené. Jaký vzduch, světlo, zvuk?',a:'Zavři oči. Představ si místo kde ti je dobře. Jaký vzduch, světlo, zvuk?',p:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&q=70'}]},
+  ang:{title:'Vztek',sub:'Jedu na nervy',photo:'https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=700&q=80&fit=crop',
+    pomoc:[{t:'Tělo před slovama',b:'Vztek potřebuje pohyb, ne slova. Pět dřepů, pět výskoků — nebo pevně zmáčkni pěst a uvolni.',a:'Vztek potřebuje pohyb, ne slova. Pět dřepů, pět výskoků, nebo pevně zmáčkni pěst a uvolni.',p:'https://images.unsplash.com/photo-1519311965067-36d3e5f33d39?w=500&q=70'},
+      {t:'Zapauzuj',b:'„Teď jsem naštvaný. Za 10 minut to zhodnotím." Ta věta je dost — nemusíš teď nic řešit.',a:'Teď jsem naštvaný. Za deset minut to zhodnotím. Ta věta je dost.',p:'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=500&q=70'}],
+    relax:[{t:'Studená voda',b:'Spusť studenou vodu na zápěstí na 30 sekund. Nervový systém zareaguje okamžitě.',a:'Spusť studenou vodu na zápěstí na třicet sekund. Nervový systém zareaguje okamžitě.',p:'https://images.unsplash.com/photo-1468276311594-df7cb65d8df6?w=500&q=70'}]},
+  fear:{title:'Strach',sub:'Bojím se co přijde',photo:'https://images.unsplash.com/photo-1448375240586-882707db888b?w=700&q=80&fit=crop',
+    pomoc:[{t:'Fakta vs. film',b:'Co je opravdu v nebezpečí teď? Napiš konkrétní fakta. Strach žije z nejistoty — konkrétnost ho zmenšuje.',a:'Co je opravdu v nebezpečí teď? Napiš konkrétní fakta. Strach žije z nejistoty — konkrétnost ho zmenšuje.',p:'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=500&q=70'},
+      {t:'Nejhorší scénář → pak?',b:'Připusť si nejhorší možnost. Přežil bys to? Mozek se uklidní, když dostane konkrétní odpověď.',a:'Připusť si nejhorší možnost. Přežil bys to? Mozek se uklidní, když dostane konkrétní odpověď.',p:'https://images.unsplash.com/photo-1519745920655-ece8f32bb4e0?w=500&q=70'}],
+    relax:[{t:'4-6 dech',b:'Nádech 4 sekundy, výdech 6. Delší výdech zapíná parasympatikus — přirozený uklidňovač těla.',a:'Nádech čtyři sekundy, výdech šest. Delší výdech zapíná přirozený uklidňovač těla.',p:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&q=70'}]},
+  lone:{title:'Osamělost',sub:'Připadám si neviditelný',photo:'https://images.unsplash.com/photo-1476820865390-c52aeebb9891?w=700&q=80&fit=crop',
+    pomoc:[{t:'Jeden kontakt',b:'Nemusí to být velký rozhovor. Stačí: „Myslel jsem na tebe." Osamělost se zmenšuje jedním spojem.',a:'Nemusí to být velký rozhovor. Stačí: Myslel jsem na tebe. Osamělost se zmenšuje jedním spojem.',p:'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=500&q=70'},
+      {t:'Být mezi lidmi (tiše)',b:'Café, knihovna, park — být fyzicky mezi lidmi bez nutnosti mluvit funguje lépe než čekáme.',a:'Café, knihovna, park. Být fyzicky mezi lidmi bez nutnosti mluvit funguje lépe než čekáme.',p:'https://images.unsplash.com/photo-1473177027534-53d906e9abcf?w=500&q=70'}],
+    relax:[{t:'Dopis od kamaráda',b:'Napiš si pět vět jako od svého nejlepšího kamaráda. Co by řekl ten, kdo tě opravdu zná?',a:'Napiš si pět vět jako od nejlepšího kamaráda. Co by řekl ten, kdo tě opravdu zná?',p:'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=500&q=70'}]},
+  over:{title:'Přetížení',sub:'Toho je moc',photo:'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=700&q=80&fit=crop',
+    pomoc:[{t:'Vysyp hlavu',b:'Napiš vše co ti leží v hlavě. Pak vyber jen jednu věc, která je nutná dnes. Zbytek počká.',a:'Napiš vše co ti leží v hlavě. Pak vyber jen jednu věc, která je nutná dnes. Zbytek počká.',p:'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=500&q=70'},
+      {t:'Jedno ano. Zbytek ne.',b:'Na dnešek jedno velké ANO a ke všemu ostatnímu „ne" nebo „možná jindy". Opravdu.',a:'Na dnešek jedno velké ano a ke všemu ostatnímu ne nebo možná jindy. Opravdu.',p:'https://images.unsplash.com/photo-1432821596592-e2c18b78144f?w=500&q=70'}],
+    relax:[{t:'15 minut offline',b:'Vypni obrazovky. 15 minut bez inputu — jen strop nebo okno. Mozek potřebuje prázdno.',a:'Patnáct minut bez obrazovky. Jen strop nebo okno. Mozek potřebuje prázdno.',p:'https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?w=500&q=70'}]}
+};
+
+var curEmo=null;
+function openEmo(key,card){
+  document.querySelectorAll('.ec').forEach(function(c){c.classList.remove('on')});
+  if(curEmo===key){curEmo=null;document.getElementById('detail').classList.remove('on');return}
+  curEmo=key;card.classList.add('on');
+  var d=ED[key];
+  document.getElementById('d-img').src=d.photo;
+  document.getElementById('d-title').textContent=d.title;
+  document.getElementById('d-sub').textContent=d.sub;
+  buildPane('t-pomoc',d.pomoc);buildPane('t-relax',d.relax);
+  document.getElementById('detail').classList.add('on');
+  openTab('pomoc',document.querySelector('.st'));
+  setTimeout(function(){document.getElementById('detail').scrollIntoView({behavior:'smooth',block:'nearest'})},80);
+}
+function buildPane(id,items){
+  document.getElementById(id).innerHTML=items.map(function(x){
+    var ea=x.a.replace(/'/g,'&#39;');
+    return'<div class="acard">'+(x.p?'<img src="'+x.p+'" alt="" loading="lazy" style="width:100%;height:110px;object-fit:cover;filter:brightness(.6)"/>':'')
+      +'<div class="acard-in"><div class="acard-title">'+x.t+'</div><div class="acard-body">'+x.b+'</div>'
+      +'<div class="row"><button class="btn-p" onclick="speakAcard(this,\''+ea+'\')">▶ Přehrát</button>'
+      +'<button class="btn-p" onclick="cpTxt(this,\''+ea+'\')">Kopírovat</button></div></div></div>';
+  }).join('');
+}
+function speakAcard(btn,text){
+  if(window.speechSynthesis.speaking){window.speechSynthesis.cancel();document.querySelectorAll('.btn-p.playing').forEach(function(b){b.classList.remove('playing');if(b.textContent==='■ Stop')b.textContent='▶ Přehrát'});if(btn.classList.contains('playing')){btn.classList.remove('playing');return}}
+  btn.classList.add('playing');btn.textContent='■ Stop';
+  var u=speakText(text);
+  u.onend=function(){btn.classList.remove('playing');btn.textContent='▶ Přehrát'};
+}
+
+function openTab(id,btn){
+  document.querySelectorAll('.st').forEach(function(b){b.classList.remove('on')});
+  document.querySelectorAll('.sp').forEach(function(p){p.classList.remove('on')});
+  btn.classList.add('on');document.getElementById('t-'+id).classList.add('on');
+  if(id!=='dychani'&&breathOn)stopBreath();
+}
+
+/* ─── PRAXE shortcuts ─── */
+var praxTexts={
+  boxbreath:'Otevírám Box Breathing. Nadechni se na 4, zadrž na 4, vydechni na 4, zadrž na 4. Opakuj.',
+  wimhof:'Wim Hof metoda. Třicet rychlých hlubokých nádechů, pak vydechni a zadrž co nejdéle. Poté jeden pomalý nádech na 15 sekund.',
+  sleep:'Spánkový dech 4-7-8. Nádech nosem na 4, zadrž na 7, vydechni ústy na 8.',
+  quick:'Rychlý reset. Čtyři hluboké nádechy. Každý výdech co nejdelší. Spusť teď.',
+  metal:'Spouštím heavy metal energii. Otevři záložku Praxe a stiskni Heavy Metal.',
+  classic:'Klasická hudba pro fokus. Ideálně Mozart nebo Bach.',
+  dramatic:'Epická hudba. Nejlepší pro vizualizaci cílů.',
+  nature:'Zvuky přírody. Moře, déšť nebo les.',
+  nidra:'Yoga Nidra. Ulehni. Zavři oči. Budeš v hluboké relaxaci za pět minut.',
+  visual:'Vizualizace budoucnosti. Zavři oči a představ si sebe za pět let. Co vidíš?',
+  sleepmed:'Spánková meditace. Stmívej světlo. Lehni si. Uvolni každý sval postupně od nohou.',
+  body:'Body scan meditace. Přenes pozornost do každé části těla. Začni u chodidel.'
+};
+function openPrax(key){
+  showScrById('s-prax');
+  document.querySelectorAll('.nb').forEach(function(b){b.classList.remove('on')});
+  document.querySelectorAll('.nb')[3].classList.add('on');
+  if(praxTexts[key]){speakText(praxTexts[key]);showMini(key.charAt(0).toUpperCase()+key.slice(1),'Praxe','https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=200&q=70')}
+  if(key==='metal'){setTimeout(function(){document.querySelector('.prax-section').scrollIntoView({behavior:'smooth'})},200)}
+}
+function openDiary(){showScrById('s-prax');document.querySelectorAll('.nb').forEach(function(b){b.classList.remove('on')});document.querySelectorAll('.nb')[3].classList.add('on');setTimeout(function(){document.getElementById('diary-input').scrollIntoView({behavior:'smooth'});document.getElementById('diary-input').focus()},300)}
+
+/* ─── LEARN ─── */
+var LEARN=[
+  {id:'napoleon',cat:'mindset',title:'Napoleon Hill — Mysl tvoří realitu',auth:'Think and Grow Rich',dur:'15 min',img:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=75',text:'Jakákoli mysl, která dokáže něco pojmout a uvěřit v to, toho může dosáhnout. Tvůj mozek je magnetem — přitahuje to, na co myslíš nejčastěji. Napoleon Hill strávil dvacet let studiem nejúspěšnějších lidí světa. Závěr: mentální postoj je důležitější než talent.'},
+  {id:'stoic',cat:'filosofie',title:'Stoická moudrost',auth:'Marcus Aurelius · Seneca · Epiktétos',dur:'12 min',img:'https://images.unsplash.com/photo-1448375240586-882707db888b?w=200&q=75',text:'Nestarej se o to, co nemůžeš ovlivnit. Ovládej jen své reakce. Marcus Aurelius vládl Římu a každé ráno psal deník. Seneca říkal: Neztrácej čas — je to jediná věc, kterou ti nikdo nevrátí. Epiktétos byl otrok a přesto jeden z nejsvobodnějších lidí v historii.'},
+  {id:'motivation',cat:'mindset',title:'Motivační řeči — série pro teenagery',auth:'Monkey Mind original',dur:'8 min',img:'https://images.unsplash.com/photo-1519311965067-36d3e5f33d39?w=200&q=75',text:'Série krátkých motivačních řečí specificky pro teenagery. Témata: zvládnutí strachu, jak přestat odkládat, co dělat když máš pocit že nikam nepatříš, a jak najít svou sílu v pubertě.'},
+  {id:'nvc',cat:'vztahy',title:'Nenásilná komunikace',auth:'Marshall Rosenberg',dur:'18 min',img:'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&q=75',text:'Čtyři kroky NVC: pozorování bez hodnocení, pocity, potřeby, žádost. Místo: Jsi idiote — říkáš: Když děláš tohle, cítím se frustrovaný, protože potřebuji respekt. Mohl bys příště...? Funguje s rodiči, kamarády i sourozenci.'},
+  {id:'mars',cat:'vztahy',title:'Muži jsou z Marsu, ženy jsou z Venuše',auth:'John Gray',dur:'20 min',img:'https://images.unsplash.com/photo-1476820865390-c52aeebb9891?w=200&q=75',text:'Muži a ženy řeší problémy jinak — a to není chyba ani slabost. Když je muž tichý, potřebuje čas v jeskyni. Když žena mluví o problémech, nechce nutně řešení — chce být slyšená. Pochopení rozdílu může zachránit vztah, přátelství i rodinu.'},
+  {id:'energy',cat:'vztahy',title:'Mužská a ženská energie',auth:'David Deida',dur:'15 min',img:'https://images.unsplash.com/photo-1501696461415-6bd6660c6742?w=200&q=75',text:'Každý člověk má v sobě mužskou i ženskou energii bez ohledu na pohlaví. Mužská energie: směr, fokus, přítomnost, zodpovědnost. Ženská energie: proudění, kreativita, emoce, propojení. Pochopit obě v sobě ti dá obrovskou výhodu ve vztazích i v životě.'},
+  {id:'semen',cat:'telo',title:'Semenná retence — co říká věda',auth:'Pro kluky',dur:'10 min',img:'https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=200&q=75',text:'Téma o kterém se nemluví, ale každý kluk se ptá. Věda říká: kratší periody abstinence mohou dočasně zvýšit testosteron a fokus. Dopaminový systém a produktivita jsou propojené. Není to o morálce — je to o pochopení svého těla a energetickém managementu.'},
+  {id:'cycle',cat:'telo',title:'Sledování cyklu — pro holky',auth:'Pro dívky',dur:'12 min',img:'https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?w=200&q=75',text:'Menstruační cyklus není jen nepříjemnost — je to superpower. Folikulární fáze: energie a kreativita. Ovulace: sociálnost a sebevědomí. Luteální fáze: introverze a hloubka. Menstruace: regenerace. Když svůj cyklus znáš, můžeš plánovat školu, sport i sociální život podle přirozených vln energie.'},
+];
+
+function buildLearnList(filter){
+  var list=LEARN.filter(function(x){return!filter||filter==='vse'||x.cat===filter});
+  document.getElementById('learn-list').innerHTML=list.map(function(x){
+    var et=x.text.replace(/'/g,'&#39;');
+    return'<div class="learn-card" onclick="openLearn(\''+x.id+'\',\''+x.img+'\',\''+x.auth+'\',\''+x.title+'\',\''+et+'\',0)">'
+      +'<img class="learn-thumb" src="'+x.img+'" alt="" loading="lazy"/>'
+      +'<div class="learn-info">'
+      +'<div class="learn-cat">'+x.cat.toUpperCase()+'</div>'
+      +'<div class="learn-title">'+x.title+'</div>'
+      +'<div class="learn-meta">'+x.auth+' · '+x.dur+'</div>'
+      +'</div>'
+      +'<div class="learn-play" onclick="event.stopPropagation();speakLearn(this,\''+et+'\',\''+x.title+'\',\''+x.img+'\')">▶</div>'
+      +'</div>';
+  }).join('');
+}
+function filterLearn(cat,btn){
+  document.querySelectorAll('#learn-chips .chip').forEach(function(b){b.classList.remove('on')});btn.classList.add('on');
+  buildLearnList(cat);
+}
+function openLearn(id,img,auth,title,text,dur){
+  var item=LEARN.find(function(x){return x.id===id});
+  if(item){speakLearn(null,item.text,item.title,item.img)}
+}
+function speakLearn(btn,text,title,img){
+  stopAll();
+  if(btn){document.querySelectorAll('.learn-play').forEach(function(b){b.classList.remove('on');b.textContent='▶'});btn.classList.add('on');btn.textContent='⏸'}
+  speakText(text);
+  showMini(title||'Učení','Monkey Mind',img||'');
+}
+
+/* ─── DIARY ─── */
+function saveDiary(){
+  var text=document.getElementById('diary-input').value.trim();
+  if(!text)return;
+  var now=new Date();
+  diaryEntries.unshift({date:now.toLocaleDateString('cs-CZ',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}),text:text});
+  document.getElementById('diary-input').value='';
+  renderDiary();
+}
+function renderDiary(){
+  document.getElementById('diary-entries').innerHTML=diaryEntries.map(function(e){
+    return'<div class="diary-entry"><div class="diary-entry-date">'+e.date+'</div><div class="diary-entry-text">'+esc(e.text)+'</div></div>';
+  }).join('');
+}
+
+/* ─── UTILS ─── */
+function cpTxt(btn,text){navigator.clipboard.writeText(text).catch(function(){});var o=btn.textContent;btn.textContent='✓ Ok';setTimeout(function(){btn.textContent=o},1600)}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+</script>
+</body>
+</html>
