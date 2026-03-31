@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FEELU – Jak se cítíš?</title>
+<style>
+  :root {
+    --color-bg: #F9F7F4;
+    --color-surface: #FFFFFF;
+    --color-surface-2: #F3F1ED;
+    --color-border: rgba(0,0,0,0.10);
+    --color-border-strong: rgba(0,0,0,0.18);
+    --color-text: #1A1916;
+    --color-text-muted: #6B6963;
+    --color-text-hint: #A09D97;
+    --color-accent: #1D9E75;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 20px;
+    --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-bg: #111110;
+      --color-surface: #1C1C1A;
+      --color-surface-2: #252522;
+      --color-border: rgba(255,255,255,0.10);
+      --color-border-strong: rgba(255,255,255,0.18);
+      --color-text: #F0EDE8;
+      --color-text-muted: #9B9890;
+      --color-text-hint: #605E58;
+    }
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--color-bg);
+    font-family: var(--font);
+    color: var(--color-text);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app {
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-bg);
+  }
+
+  /* ── NAV ── */
+  .nav {
+    display: flex;
+    background: var(--color-surface);
+    border-bottom: 0.5px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-btn {
+    flex: 1;
+    padding: 15px 4px 13px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    background: none;
+    border: none;
+    border-bottom: 2.5px solid transparent;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+    font-family: var(--font);
+  }
+  .nav-btn.active {
+    color: var(--color-text);
+    border-bottom-color: var(--color-text);
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; flex: 1; padding: 22px 16px 60px; }
+  .screen.active { display: block; }
+
+  /* ── TYPOGRAPHY ── */
+  .page-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 5px;
+    letter-spacing: -0.3px;
+  }
+  .page-sub {
+    font-size: 14px;
+    color: var(--color-text-muted);
+    margin-bottom: 26px;
+    line-height: 1.5;
+  }
+  .section-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--color-text-hint);
+    margin-bottom: 12px;
+  }
+
+  /* ── MOOD GRID ── */
+  .mood-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .mood-btn {
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 14px 4px 11px;
+    background: var(--color-surface);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.18s;
+    font-family: var(--font);
+  }
+  .mood-btn:active { transform: scale(0.96); }
+  .mood-btn .mi { font-size: 26px; line-height: 1; }
+  .mood-btn .ml { font-size: 10.5px; color: var(--color-text-muted); text-align: center; line-height: 1.3; }
+  .mood-btn.sel-great { border-color: #1D9E75; background: #E1F5EE; }
+  .mood-btn.sel-great .ml { color: #0F6E56; }
+  .mood-btn.sel-ok    { border-color: #378ADD; background: #E6F1FB; }
+  .mood-btn.sel-ok .ml { color: #185FA5; }
+  .mood-btn.sel-meh   { border-color: #BA7517; background: #FAEEDA; }
+  .mood-btn.sel-meh .ml { color: #854F0B; }
+  .mood-btn.sel-sad   { border-color: #534AB7; background: #EEEDFE; }
+  .mood-btn.sel-sad .ml { color: #3C3489; }
+  .mood-btn.sel-bad   { border-color: #993C1D; background: #FAECE7; }
+  .mood-btn.sel-bad .ml { color: #712B13; }
+
+  /* ── RESPONSE CARD ── */
+  .resp-card {
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    padding: 16px 18px;
+    margin-bottom: 26px;
+    display: none;
+    animation: fadeIn 0.25s ease;
+  }
+  .resp-card.show { display: block; }
+  .resp-eyebrow { font-size: 11px; color: var(--color-text-hint); margin-bottom: 6px; }
+  .resp-mood { font-size: 17px; font-weight: 600; color: var(--color-text); margin-bottom: 8px; }
+  .resp-msg { font-size: 14px; color: var(--color-text-muted); line-height: 1.6; margin-bottom: 14px; }
+  .resp-cta {
+    display: inline-block;
+    font-size: 13px;
+    border: 0.5px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    padding: 8px 16px;
+    background: none;
+    cursor: pointer;
+    color: var(--color-text);
+    font-family: var(--font);
+    transition: background 0.15s;
+  }
+  .resp-cta:hover { background: var(--color-surface-2); }
+
+  /* ── LOG ── */
+  .log-section { margin-top: 6px; }
+  .log-header { font-size: 13px; font-weight: 500; color: var(--color-text-muted); margin-bottom: 12px; }
+  .log-empty { font-size: 13px; color: var(--color-text-hint); }
+  .log-list { display: flex; flex-direction: column; gap: 8px; }
+  .log-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+  .log-icon { font-size: 20px; }
+  .log-label { font-size: 13px; font-weight: 500; color: var(--color-text); }
+  .log-time { font-size: 12px; color: var(--color-text-hint); }
+
+  /* ── EMOTION GRID ── */
+  .emotion-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .ec {
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 16px 14px;
+    cursor: pointer;
+    transition: all 0.18s;
+    background: var(--color-surface);
+  }
+  .ec:active { transform: scale(0.97); }
+  .ec .ei { font-size: 24px; margin-bottom: 9px; }
+  .ec .en { font-size: 13.5px; font-weight: 600; color: var(--color-text); }
+  .ec .ed { font-size: 12px; color: var(--color-text-muted); margin-top: 3px; line-height: 1.4; }
+
+  .ec-anx  { background: #FAEEDA; border-color: #FAC775; }
+  .ec-anx  .en { color: #633806; } .ec-anx  .ed { color: #854F0B; }
+  .ec-sad  { background: #E6F1FB; border-color: #B5D4F4; }
+  .ec-sad  .en { color: #042C53; } .ec-sad  .ed { color: #185FA5; }
+  .ec-ang  { background: #FCEBEB; border-color: #F7C1C1; }
+  .ec-ang  .en { color: #501313; } .ec-ang  .ed { color: #A32D2D; }
+  .ec-fear { background: #EEEDFE; border-color: #CECBF6; }
+  .ec-fear .en { color: #26215C; } .ec-fear .ed { color: #534AB7; }
+  .ec-lone { background: #E1F5EE; border-color: #9FE1CB; }
+  .ec-lone .en { color: #04342C; } .ec-lone .ed { color: #0F6E56; }
+  .ec-over { background: #F1EFE8; border-color: #D3D1C7; }
+  .ec-over .en { color: #2C2C2A; } .ec-over .ed { color: #5F5E5A; }
+
+  @media (prefers-color-scheme: dark) {
+    .ec-anx  { background: #2A1E06; border-color: #6B4D0F; }
+    .ec-anx  .en { color: #FAC775; } .ec-anx  .ed { color: #BA7517; }
+    .ec-sad  { background: #04162A; border-color: #0C3D6E; }
+    .ec-sad  .en { color: #B5D4F4; } .ec-sad  .ed { color: #378ADD; }
+    .ec-ang  { background: #2A0808; border-color: #6E1F1F; }
+    .ec-ang  .en { color: #F7C1C1; } .ec-ang  .ed { color: #E24B4A; }
+    .ec-fear { background: #15122E; border-color: #3A3480; }
+    .ec-fear .en { color: #CECBF6; } .ec-fear .ed { color: #7F77DD; }
+    .ec-lone { background: #041A12; border-color: #0A4D35; }
+    .ec-lone .en { color: #9FE1CB; } .ec-lone .ed { color: #1D9E75; }
+    .ec-over { background: #1A1916; border-color: #3D3C38; }
+    .ec-over .en { color: #D3D1C7; } .ec-over .ed { color: #888780; }
+  }
+
+  /* ── DETAIL PANEL ── */
+  .detail {
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    overflow: hidden;
+    margin-bottom: 20px;
+    animation: fadeIn 0.2s ease;
+    display: none;
+  }
+  .detail.show { display: block; }
+  .detail-hdr { padding: 16px 18px 0; }
+  .detail-title { font-size: 16px; font-weight: 600; color: var(--color-text); }
+  .detail-sub { font-size: 13px; color: var(--color-text-muted); margin-top: 3px; margin-bottom: 14px; }
+
+  /* ── SUB TABS ── */
+  .sub-tabs {
+    display: flex;
+    border-top: 0.5px solid var(--color-border);
+    border-bottom: 0.5px solid var(--color-border);
+    background: var(--color-surface-2);
+  }
+  .st {
+    flex: 1;
+    padding: 10px 4px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.18s;
+    font-family: var(--font);
+  }
+  .st.active {
+    color: var(--color-text);
+    border-bottom-color: var(--color-text);
+    background: var(--color-surface);
+  }
+  .sub-pane { display: none; padding: 16px; }
+  .sub-pane.active { display: block; }
+
+  /* ── AUDIO CARD ── */
+  .acard {
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    margin-bottom: 10px;
+    background: var(--color-surface-2);
+  }
+  .acard-title { font-size: 14px; font-weight: 600; color: var(--color-text); margin-bottom: 5px; }
+  .acard-body { font-size: 13px; color: var(--color-text-muted); line-height: 1.6; margin-bottom: 12px; }
+  .acard-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn-sm {
+    font-size: 12.5px;
+    border: 0.5px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    padding: 7px 13px;
+    background: var(--color-surface);
+    cursor: pointer;
+    color: var(--color-text);
+    font-family: var(--font);
+    transition: all 0.15s;
+  }
+  .btn-sm:hover { background: var(--color-surface-2); }
+  .btn-sm.playing { border-color: #1D9E75; color: #0F6E56; background: #E1F5EE; }
+  @media (prefers-color-scheme: dark) {
+    .btn-sm.playing { background: #041A12; color: #9FE1CB; border-color: #0F6E56; }
+  }
+
+  /* ── BREATHING ── */
+  .breath-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 0 16px;
+  }
+  .breath-outer {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 1.5px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 4s ease-in-out, border-color 0.4s;
+    margin-bottom: 22px;
+  }
+  .breath-outer.expand { transform: scale(1.28); border-color: #1D9E75; }
+  .breath-outer.hold   { transform: scale(1.28); border-color: #378ADD; }
+  .breath-outer.shrink { transform: scale(1.0);  border-color: #BA7517; }
+  .breath-inner {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: var(--color-surface-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .breath-phase { font-size: 12px; font-weight: 600; color: var(--color-text-muted); }
+  .breath-num   { font-size: 30px; font-weight: 600; color: var(--color-text); line-height: 1; }
+  .breath-hint  { font-size: 13px; color: var(--color-text-muted); margin-bottom: 18px; text-align: center; }
+  .btn-breath {
+    border: 0.5px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    padding: 10px 28px;
+    font-size: 14px;
+    font-weight: 500;
+    background: none;
+    cursor: pointer;
+    color: var(--color-text);
+    font-family: var(--font);
+    transition: background 0.15s;
+  }
+  .btn-breath:hover { background: var(--color-surface-2); }
+
+  /* ── 5-4-3-2-1 GAME ── */
+  .game-intro { font-size: 13px; color: var(--color-text-muted); margin-bottom: 16px; line-height: 1.5; }
+  .game-step {
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 13px 14px;
+    margin-bottom: 10px;
+    background: var(--color-surface-2);
+  }
+  .gs-num { font-size: 11px; color: var(--color-text-hint); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .gs-q   { font-size: 14px; font-weight: 500; color: var(--color-text); margin-bottom: 8px; }
+  .game-step textarea {
+    width: 100%;
+    border: 0.5px solid var(--color-border-strong);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 13px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    resize: none;
+    font-family: var(--font);
+    line-height: 1.5;
+  }
+
+  /* ── FILTER CHIPS ── */
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .chip {
+    padding: 7px 15px;
+    border: 0.5px solid var(--color-border-strong);
+    border-radius: 20px;
+    font-size: 13px;
+    background: var(--color-surface);
+    cursor: pointer;
+    color: var(--color-text-muted);
+    font-family: var(--font);
+    transition: all 0.18s;
+  }
+  .chip.active {
+    border-color: var(--color-text);
+    color: var(--color-text);
+    background: var(--color-surface-2);
+    font-weight: 500;
+  }
+
+  /* ── AP CARDS ── */
+  .ap-section { margin-bottom: 28px; }
+  .ap-section-title {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 0.5px solid var(--color-border);
+  }
+  .ap-card {
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 16px 18px;
+    margin-bottom: 10px;
+    background: var(--color-surface);
+  }
+  .ap-tag {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 5px;
+    margin-bottom: 9px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .tag-u { background: #E1F5EE; color: #0F6E56; }
+  .tag-s { background: #EEEDFE; color: #534AB7; }
+  .tag-k { background: #FCEBEB; color: #A32D2D; }
+  @media (prefers-color-scheme: dark) {
+    .tag-u { background: #041A12; color: #9FE1CB; }
+    .tag-s { background: #15122E; color: #CECBF6; }
+    .tag-k { background: #2A0808; color: #F7C1C1; }
+  }
+  .ap-title { font-size: 15px; font-weight: 600; color: var(--color-text); margin-bottom: 6px; }
+  .ap-body  { font-size: 13.5px; color: var(--color-text-muted); line-height: 1.65; margin-bottom: 14px; }
+
+  /* ── LOCKER ── */
+  .locker {
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 16px 18px;
+    background: var(--color-surface-2);
+    margin-top: 6px;
+  }
+  .locker-title { font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 12px; }
+  .locker-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  .locker input, .locker textarea {
+    width: 100%;
+    border: 0.5px solid var(--color-border-strong);
+    border-radius: 8px;
+    padding: 9px 11px;
+    font-size: 13px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-family: var(--font);
+  }
+  .locker textarea { resize: none; height: 72px; display: block; line-height: 1.5; }
+  .locker-btns { display: flex; gap: 8px; margin-top: 10px; }
+  .locker-btns button {
+    font-size: 12.5px;
+    border: 0.5px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    padding: 7px 14px;
+    background: var(--color-surface);
+    cursor: pointer;
+    color: var(--color-text);
+    font-family: var(--font);
+    transition: background 0.15s;
+  }
+  .locker-btns button:hover { background: var(--color-surface-2); }
+  .locker-log { margin-top: 14px; display: flex; flex-direction: column; gap: 7px; }
+  .locker-entry {
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+    padding: 9px 12px;
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    line-height: 1.5;
+  }
+  .locker-entry strong { color: var(--color-text); }
+
+  /* ── UTIL ── */
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- NAV -->
+  <nav class="nav">
+    <button class="nav-btn active" onclick="showScreen('home', this)">Jak se cítíš?</button>
+    <button class="nav-btn" onclick="showScreen('pocity', this)">Pocity</button>
+    <button class="nav-btn" onclick="showScreen('audio', this)">Audio Pomoc</button>
+  </nav>
+
+  <!-- ═══ HOME ═══ -->
+  <div class="screen active" id="home">
+    <p class="page-title">Ahoj! Jak se dnes cítíš?</p>
+    <p class="page-sub">Vyber náladu — zaznamenáme ji do deníku.</p>
+
+    <div class="mood-grid">
+      <button class="mood-btn" data-cls="sel-great" onclick="selectMood(this,'Skvěle','😄','Jsem rád, že ti je dobře! Zkus si ten pocit zapamatovat — co ho dnes způsobilo?')">
+        <span class="mi">😄</span><span class="ml">Skvěle</span>
+      </button>
+      <button class="mood-btn" data-cls="sel-ok" onclick="selectMood(this,'V pohodě','🙂','To je fajn. Klidný den je taky dobrý den.')">
+        <span class="mi">🙂</span><span class="ml">V pohodě</span>
+      </button>
+      <button class="mood-btn" data-cls="sel-meh" onclick="selectMood(this,'Ujde to','😐','Ani ryba, ani rak — a to je taky v pořádku. Zkus jedno malé potěšení.')">
+        <span class="mi">😐</span><span class="ml">Ujde to</span>
+      </button>
+      <button class="mood-btn" data-cls="sel-sad" onclick="selectMood(this,'Smutně','😔','Smutek je signál, ne slabost. Mrkni do záložky Pocity — je tam pro tebe.')">
+        <span class="mi">😔</span><span class="ml">Smutně</span>
+      </button>
+      <button class="mood-btn" data-cls="sel-bad" onclick="selectMood(this,'Těžce','😟','To zní opravdu těžce. Nejsi sám. Audio Pomoc má věty a zvuky, které mohou pomoci.')">
+        <span class="mi">😟</span><span class="ml">Těžce</span>
+      </button>
+    </div>
+
+    <div class="resp-card" id="resp-card">
+      <div class="resp-eyebrow">Tvoje nálada teď</div>
+      <div class="resp-mood" id="resp-mood"></div>
+      <div class="resp-msg" id="resp-msg"></div>
+      <button class="resp-cta" onclick="showScreen('pocity', document.querySelectorAll('.nav-btn')[1])">Otevřít Pocity →</button>
+    </div>
+
+    <div class="log-section">
+      <div class="log-header">Dnešní záznamy</div>
+      <div class="log-empty" id="log-empty">Zatím žádný záznam. Vyber náladu nahoře.</div>
+      <div class="log-list" id="log-list"></div>
+    </div>
+  </div>
+
+  <!-- ═══ POCITY ═══ -->
+  <div class="screen" id="pocity">
+    <div class="section-eyebrow">Vyber pocit</div>
+    <div class="emotion-grid">
+      <div class="ec ec-anx" onclick="openEmotion('anx',this)">
+        <div class="ei">🌀</div>
+        <div class="en">Úzkost a panika</div>
+        <div class="ed">Myšlenky se točí v kruhu</div>
+      </div>
+      <div class="ec ec-sad" onclick="openEmotion('sad',this)">
+        <div class="ei">🌧</div>
+        <div class="en">Smutek</div>
+        <div class="ed">Těžko se vstává</div>
+      </div>
+      <div class="ec ec-ang" onclick="openEmotion('ang',this)">
+        <div class="ei">🔥</div>
+        <div class="en">Vztek</div>
+        <div class="ed">Všechno jde mě na nervy</div>
+      </div>
+      <div class="ec ec-fear" onclick="openEmotion('fear',this)">
+        <div class="ei">🫣</div>
+        <div class="en">Strach</div>
+        <div class="ed">Bojím se, co přijde</div>
+      </div>
+      <div class="ec ec-lone" onclick="openEmotion('lone',this)">
+        <div class="ei">🌿</div>
+        <div class="en">Osamělost</div>
+        <div class="ed">Připadám si neviditelný</div>
+      </div>
+      <div class="ec ec-over" onclick="openEmotion('over',this)">
+        <div class="ei">⚡</div>
+        <div class="en">Přetížení</div>
+        <div class="ed">Toho je příliš mnoho</div>
+      </div>
+    </div>
+
+    <!-- DETAIL -->
+    <div class="detail" id="detail">
+      <div class="detail-hdr">
+        <div class="detail-title" id="d-title"></div>
+        <div class="detail-sub" id="d-sub"></div>
+      </div>
+      <div class="sub-tabs">
+        <button class="st active" onclick="openTab('pomoc',this)">Co pomáhá</button>
+        <button class="st" onclick="openTab('dychani',this)">Dýchání</button>
+        <button class="st" onclick="openTab('hra',this)">5-4-3-2-1</button>
+        <button class="st" onclick="openTab('relax',this)">Relaxace</button>
+      </div>
+      <div class="sub-pane active" id="t-pomoc"></div>
+      <div class="sub-pane" id="t-dychani">
+        <div class="breath-wrap">
+          <div class="breath-outer" id="b-ring">
+            <div class="breath-inner">
+              <span class="breath-phase" id="b-phase">—</span>
+              <span class="breath-num" id="b-num">4</span>
+            </div>
+          </div>
+          <div class="breath-hint" id="b-hint">Stiskni Start a dýchej se mnou.</div>
+          <button class="btn-breath" id="b-btn" onclick="toggleBreath()">Start</button>
+        </div>
+      </div>
+      <div class="sub-pane" id="t-hra">
+        <p class="game-intro">Technika 5-4-3-2-1 zakotvuje v přítomnosti. Vyplň každý krok pomalu.</p>
+        <div class="game-step">
+          <div class="gs-num">5 věcí</div>
+          <div class="gs-q">Co právě vidíš kolem sebe?</div>
+          <textarea rows="2" placeholder="Napiš 5 věcí..."></textarea>
+        </div>
+        <div class="game-step">
+          <div class="gs-num">4 věci</div>
+          <div class="gs-q">Co fyzicky cítíš (dotyk)?</div>
+          <textarea rows="2" placeholder="Stolek, svetr, podlaha..."></textarea>
+        </div>
+        <div class="game-step">
+          <div class="gs-num">3 věci</div>
+          <div class="gs-q">Co slyšíš v tuto chvíli?</div>
+          <textarea rows="2" placeholder="Zvuky kolem tebe..."></textarea>
+        </div>
+        <div class="game-step">
+          <div class="gs-num">2 věci</div>
+          <div class="gs-q">Co cítíš (vůní)?</div>
+          <textarea rows="1" placeholder="Káva, vzduch..."></textarea>
+        </div>
+        <div class="game-step">
+          <div class="gs-num">1 věc</div>
+          <div class="gs-q">Co cítíš teď na jazyku?</div>
+          <textarea rows="1" placeholder="Jedna chuť..."></textarea>
+        </div>
+      </div>
+      <div class="sub-pane" id="t-relax"></div>
+    </div>
+  </div>
+
+  <!-- ═══ AUDIO POMOC ═══ -->
+  <div class="screen" id="audio">
+    <p class="page-title">Audio Pomoc</p>
+    <p class="page-sub">Věty, zvuky a kroky pro těžké chvíle.</p>
+
+    <div class="chips">
+      <button class="chip active" onclick="filterAP('vse',this)">Vše</button>
+      <button class="chip" onclick="filterAP('u',this)">Uklidnění</button>
+      <button class="chip" onclick="filterAP('s',this)">Šikana</button>
+      <button class="chip" onclick="filterAP('k',this)">Krize / SOS</button>
+    </div>
+
+    <!-- UKLIDNĚNÍ -->
+    <div class="ap-section" id="sec-u">
+      <div class="ap-section-title">Uklidnění</div>
+
+      <div class="ap-card">
+        <span class="ap-tag tag-u">Uklidnění</span>
+        <div class="ap-title">Po sociálním přehlcení</div>
+        <div class="ap-body">Teď nemusíš vyřešit celý den. Jen stáhni ramena dolů a pomalu vydechni. To, co se stalo, není celý příběh o tobě.</div>
+        <div class="acard-btns">
+          <button class="btn-sm" onclick="playAudio(this,'Teď nemusíš vyřešit celý den. Jen stáhni ramena dolů a pomalu vydechni. To, co se stalo, není celý příběh o tobě.')">▶ Přehrát</button>
+          <button class="btn-sm" onclick="copyTxt(this,'To, co se stalo, není celý příběh o tobě.')">Kopírovat větu</button>
+        </div>
+      </div>
+
+      <div class="ap-card">
+        <span class="ap-tag tag-u">Uklidnění</span>
+        <div class="ap-title">Těžké myšlenky v noci</div>
+        <div class="ap-body">Myšlenka není proroctví. Vrať oči do místnosti — tady a teď jsi v bezpečí. Zkrať horizont jen na příštích pět minut.</div>
+        <div class="acard-btns">
+          <button class="btn-sm" onclick="playAudio(this,'Myšlenka není proroctví. Vrať oči do místnosti. Tady a teď jsi v bezpečí. Zkrať horizont jen na příštích pět minut.')">▶ Přehrát</button>
+          <button class="btn-sm" onclick="copyTxt(this,'Myšlenka není proroctví. Tady a teď jsi v bezpečí.')">Kopírovat větu</button>
+        </div>
+      </div>
+
+      <div class="ap-card">
+        <span class="ap-tag tag-u">Uklidnění</span>
+        <div class="ap-title">Klid po konfliktu</div>
+        <div class="ap-body">Hádka skončila. Momentálně jsi v bezpečí. Mozek ještě jede na vysoké obrátky — to je normální. Dej mu chvilku.</div>
+        <div class="acard-btns">
+          <button class="btn-sm" onclick="playAudio(this,'Hádka skončila. Momentálně jsi v bezpečí. Mozek ještě jede na vysoké obrátky — to je normální. Dej mu chvilku.')">▶ Přehrát</button>
+          <button class="btn-sm" onclick="copyTxt(this,'Momentálně jsem v bezpečí. Dám mozku chvilku.')">Kopírovat větu</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ŠIKANA -->
+    <div class="ap-section" id="sec-s">
+      <div class="ap-section-title">Šikana</div>
+
+      <div class="ap-card">
+        <span class="ap-tag tag-s">Šikana</span>
+        <div class="ap-title">Když tě někdo zmenšuje</div>
+        <div class="ap-body">Tohle, co řekli, je jejich problém — ne tvoje pravda o sobě. Vyhledej jednoho dospělého, kterému věříš, a řekni mu přesně co se stalo.</div>
+        <div class="acard-btns">
+          <button class="btn-sm" onclick="playAudio(this,'Tohle, co řekli, je jejich problém — ne tvoje pravda o sobě. Vyhledej jednoho dospělého, kterému věříš.')">▶ Přehrát</button>
+          <button class="btn-sm" onclick="copyTxt(this,'Co řekli, je jejich problém — ne moje pravda o sobě.')">Kopírovat větu pro sebe</button>
+        </div>
+      </div>
+
+      <div class="ap-card">
+        <span class="ap-tag tag-s">Šikana</span>
+        <div class="ap-title">Připravená věta pro dospělého</div>
+        <div class="ap-body">„Potřebuji ti říct něco důležitého. Děje se mi tohle a nevím si rady sám. Prosím pomoz mi."</div>
+        <div class="acard-btns">
+          <button class="btn-sm" onclick="playAudio(this,'Potřebuji ti říct něco důležitého. Děje se mi tohle a nevím si rady sám. Prosím pomoz mi.')">▶ Přehrát</button>
+          <button class="btn-sm" onclick="copyTxt(this,'Potřebuji ti říct něco důležitého. Děje se mi tohle a nevím si rady sám. Prosím pomoz mi.')">Kopírovat</button>
+        </div>
+      </div>
+
+      <div class="locker">
+        <div class="locker-title">Evidence locker — zaznamenej si fakta</div>
+        <div class="locker-row">
+          <input type="text" id="lk-when" placeholder="Kdy a kde" />
+          <input type="text" id="lk-who" placeholder="Kdo to udělal" />
+        </div>
+        <textarea id="lk-what" placeholder="Co přesně se stalo (jen fakta, bez hodnocení)"></textarea>
+        <div class="locker-btns">
+          <button onclick="saveLock()">Uložit záznam</button>
+          <button onclick="clearLock()">Smazat vše</button>
+        </div>
+        <div class="locker-log" id="lk-log"></div>
+      </div>
+    </div>
+
+    <!-- KRIZE -->
+    <div class="ap-section" id="sec-k">
+      <div class="ap-section-title">Krize / SOS</div>
+
+      <div class="ap-card">
+        <span class="ap-tag tag-k">SOS</span>
+        <div class="ap-title">Pro opravdu těžký moment</div>
+        <div class="ap-body">Teď je toho na mě moc a potřebuji být s někým bezpečným. Prosím zůstaň se mnou a pomoz mi udělat další krok.</div>
+        <div class="acard-btns">
+          <button class="btn-sm" onclick="playAudio(this,'Teď je toho na mě moc a potřebuji být s někým bezpečným. Prosím zůstaň se mnou a pomoz mi udělat další krok.')">▶ Přehrát</button>
+          <button class="btn-sm" onclick="copyTxt(this,'Teď je toho na mě moc a potřebuji být s někým bezpečným. Prosím zůstaň se mnou a pomoz mi udělat další krok.')">Kopírovat</button>
+        </div>
+      </div>
+
+      <div class="ap-card">
+        <span class="ap-tag tag-k">SOS</span>
+        <div class="ap-title">Věta pro rodiče nebo učitele</div>
+        <div class="ap-body">„Mám se teď opravdu špatně a potřebuji pomoc. Nechci to řešit sám. Můžeš být teď se mnou?"</div>
+        <div class="acard-btns">
+          <button class="btn-sm" onclick="playAudio(this,'Mám se teď opravdu špatně a potřebuji pomoc. Nechci to řešit sám. Můžeš být teď se mnou?')">▶ Přehrát</button>
+          <button class="btn-sm" onclick="copyTxt(this,'Mám se teď opravdu špatně a potřebuji pomoc. Nechci to řešit sám. Můžeš být teď se mnou?')">Kopírovat</button>
+        </div>
+      </div>
+
+      <div class="ap-card">
+        <span class="ap-tag tag-k">Linka bezpečí</span>
+        <div class="ap-title">Linka bezpečí — 116 111</div>
+        <div class="ap-body">Kdykoli, zdarma, anonymně — pro děti a mladé do 26 let. Zavolej nebo napiš online na linkabezpeci.cz</div>
+        <div class="acard-btns">
+          <button class="btn-sm" onclick="copyTxt(this,'116 111')">Kopírovat číslo</button>
+          <button class="btn-sm" onclick="playAudio(this,'Linka bezpečí. Číslo jedna jedna šest, jedna jedna jedna. Kdykoli, zdarma, anonymně.')">▶ Přehrát</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /.app -->
+
+<script>
+/* ───────── DATA ───────── */
+var ED = {
+  anx: {
+    title: 'Úzkost a panika',
+    sub: 'Když myšlenky utíkají příliš daleko dopředu',
+    pomoc: [
+      { t:'Odzoom z katastrofy', b:'Zeptej se sám sebe: je to jistá pravda, nebo jen nejhorší možný scénář? Fakta jsou pevná — katastrofická věta je jen věta.', a:'Je to jistá pravda, nebo jen nejhorší možný scénář? Fakta jsou pevná. Katastrofická věta je jen věta.' },
+      { t:'Zkrať horizont', b:'Neřeš celý týden. Jen příštích deset minut. Co je úplně nejmenší krok, který teď zvládneš?', a:'Neřeš celý týden. Jen příštích deset minut. Co je úplně nejmenší krok, který teď zvládneš?' }
+    ],
+    relax: [
+      { t:'Body scan', b:'Zavři oči. Začni u chodidel — jsou teplá nebo studená? Pomalu posunuj pozornost nahoru, jen pozoruj, nesouď.', a:'Zavři oči. Začni u chodidel. Jsou teplá nebo studená? Pomalu posunuj pozornost nahoru. Jen pozoruj. Nesouď.' }
+    ]
+  },
+  sad: {
+    title: 'Smutek',
+    sub: 'Když je všechno šedé a těžké',
+    pomoc: [
+      { t:'Pojmenuj to', b:'Smutek je těžší, když ho tlačíme dolů. Zkus říct nebo napsat: „Teď je mi smutno, protože…" a nech větu dojít na konec.', a:'Smutek je těžší, když ho tlačíme dolů. Zkus říct nebo napsat: Teď je mi smutno, protože... a nech větu dojít na konec.' },
+      { t:'Jeden malý čin', b:'Když je energie nulová, jeden čin stačí: šálek čaje, tři minuty venku, zpráva kamarádovi.', a:'Jeden malý čin stačí. Šálek čaje. Tři minuty venku. Zpráva kamarádovi.' }
+    ],
+    relax: [
+      { t:'Bezpečné místo', b:'Zavři oči a představ si místo, kde se cítíš bezpečně. Může být reálné nebo vymyšlené. Jaký tam je vzduch, světlo, zvuk?', a:'Zavři oči a představ si místo, kde se cítíš bezpečně. Může být reálné nebo vymyšlené. Jaký tam je vzduch, světlo, zvuk?' }
+    ]
+  },
+  ang: {
+    title: 'Vztek',
+    sub: 'Když vše jde na nervy',
+    pomoc: [
+      { t:'Fyzický výboj', b:'Vztek potřebuje tělo, ne slova. Pět dřepů, pět výskoků — nebo jen pevně zmáčkni ruku v pěst a uvolni.', a:'Vztek potřebuje tělo, ne slova. Pět dřepů, pět výskoků. Nebo jen pevně zmáčkni ruku v pěst a uvolni.' },
+      { t:'Pozastavit reakci', b:'„Teď jsem naštvaný a za 10 minut znovu zhodnotím situaci." Tato věta je dost. Nemusíš nic řešit teď hned.', a:'Teď jsem naštvaný a za deset minut znovu zhodnotím situaci. Tato věta je dost. Nemusíš nic řešit teď hned.' }
+    ],
+    relax: [
+      { t:'Studená voda', b:'Rychlý reset: spusť studenou vodu na zápěstí na 30 sekund. Nervový systém zareaguje. Dech se zpomalí.', a:'Rychlý reset. Spusť studenou vodu na zápěstí na třicet sekund. Nervový systém zareaguje. Dech se zpomalí.' }
+    ]
+  },
+  fear: {
+    title: 'Strach',
+    sub: 'Když se bojíš, co přijde',
+    pomoc: [
+      { t:'Fakta vs. pocity', b:'Co je opravdu v nebezpečí teď, v tuto chvíli? Vypiš konkrétní fakta. Strach živí nejistota — konkrétnost ho zmenšuje.', a:'Co je opravdu v nebezpečí teď, v tuto chvíli? Vypiš konkrétní fakta. Strach živí nejistota. Konkrétnost ho zmenšuje.' },
+      { t:'Nejhorší scénář a pak?', b:'Připusť si nejhorší možnost — a pak: mohl bys to přežít? Co by ti pomohlo? Mozek se uklidní, když dostane odpověď.', a:'Připusť si nejhorší možnost. A pak: mohl bys to přežít? Co by ti pomohlo? Mozek se uklidní, když dostane odpověď.' }
+    ],
+    relax: [
+      { t:'Zemňovací dech', b:'Nádech 4, výdech 6. Prodloužený výdech aktivuje parasympatikus. Opakuj šestkrát.', a:'Nádech čtyři, výdech šest. Prodloužený výdech aktivuje klid. Opakuj šestkrát.' }
+    ]
+  },
+  lone: {
+    title: 'Osamělost',
+    sub: 'Když se cítíš neviditelný',
+    pomoc: [
+      { t:'Jeden kontakt', b:'Nemusí to být rozhovor. Stačí zpráva: „Myslel jsem na tebe." Osamělost se zmenšuje jedním spojem.', a:'Nemusí to být rozhovor. Stačí zpráva. Myslel jsem na tebe. Osamělost se zmenšuje jedním spojem.' },
+      { t:'Přítomnost bez slov', b:'Café, knihovna, park — být fyzicky mezi lidmi bez nutnosti mluvit pomáhá víc, než čekáme.', a:'Café, knihovna, park. Být fyzicky mezi lidmi bez nutnosti mluvit pomáhá víc, než čekáme.' }
+    ],
+    relax: [
+      { t:'Dopis sobě', b:'Napiš si pět vět jako od nejlepšího kamaráda. Co by ti řekl ten, kdo tě dobře zná a fandí ti?', a:'Napiš si pět vět jako od nejlepšího kamaráda. Co by ti řekl ten, kdo tě dobře zná a fandí ti?' }
+    ]
+  },
+  over: {
+    title: 'Přetížení',
+    sub: 'Když toho je příliš mnoho',
+    pomoc: [
+      { t:'Stop a seznam', b:'Napiš vše, co ti leží v hlavě. Pak označ jen jednu věc, která je opravdu nutná dnes. Zbytek počká.', a:'Napiš vše, co ti leží v hlavě. Pak označ jen jednu věc, která je opravdu nutná dnes. Zbytek počká.' },
+      { t:'Jedno ANO, vše ostatní ne', b:'Na dnešek si dovol jedno velké ANO a ke všemu ostatnímu říkej „ne" nebo „možná jindy".', a:'Na dnešek si dovol jedno velké ano a ke všemu ostatnímu říkej ne nebo možná jindy.' }
+    ],
+    relax: [
+      { t:'15 minut prázdna', b:'Vypni obrazovky. 15 minut bez inputu — jen strop, okno nebo list papíru. Mozek potřebuje prázdno.', a:'Patnáct minut bez obrazovky, bez inputu. Jen strop, okno nebo list papíru. Mozek potřebuje prázdno.' }
+    ]
+  }
+};
+
+/* ───────── NAV ───────── */
+function showScreen(id, btn) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ───────── MOOD ───────── */
+var moodLog = [];
+function selectMood(btn, label, icon, msg) {
+  document.querySelectorAll('.mood-btn').forEach(function(b){
+    b.className = 'mood-btn';
+  });
+  btn.classList.add(btn.dataset.cls);
+  document.getElementById('resp-mood').textContent = icon + '  ' + label;
+  document.getElementById('resp-msg').textContent = msg;
+  document.getElementById('resp-card').classList.add('show');
+  var now = new Date();
+  var t = now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
+  moodLog.unshift({ icon: icon, label: label, time: t });
+  renderLog();
+}
+function renderLog() {
+  var list = document.getElementById('log-list');
+  var empty = document.getElementById('log-empty');
+  if (!moodLog.length) { empty.style.display = ''; list.innerHTML = ''; return; }
+  empty.style.display = 'none';
+  list.innerHTML = moodLog.map(function(e){
+    return '<div class="log-row"><span class="log-icon">'+e.icon+'</span><div style="flex:1"><div class="log-label">'+e.label+'</div></div><div class="log-time">'+e.time+'</div></div>';
+  }).join('');
+}
+
+/* ───────── EMOTION CARDS ───────── */
+var curEmotion = null;
+function openEmotion(key, card) {
+  document.querySelectorAll('.ec').forEach(function(c){ c.style.outline = ''; });
+  if (curEmotion === key) {
+    curEmotion = null;
+    document.getElementById('detail').classList.remove('show');
+    return;
+  }
+  curEmotion = key;
+  card.style.outline = '2px solid currentColor';
+  var d = ED[key];
+  document.getElementById('d-title').textContent = d.title;
+  document.getElementById('d-sub').textContent = d.sub;
+  buildCards('t-pomoc', d.pomoc);
+  buildCards('t-relax', d.relax);
+  document.getElementById('detail').classList.add('show');
+  openTab('pomoc', document.querySelector('.st'));
+  setTimeout(function(){ document.getElementById('detail').scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 60);
+}
+function buildCards(paneId, items) {
+  document.getElementById(paneId).innerHTML = items.map(function(item){
+    var esc = item.a.replace(/'/g,"&#39;");
+    return '<div class="acard"><div class="acard-title">'+item.t+'</div><div class="acard-body">'+item.b+'</div><div class="acard-btns"><button class="btn-sm" onclick="playAudio(this,\''+esc+'\')">▶ Přehrát</button></div></div>';
+  }).join('');
+}
+
+/* ───────── SUB TABS ───────── */
+function openTab(id, btn) {
+  document.querySelectorAll('.st').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.sub-pane').forEach(function(p){ p.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById('t-'+id).classList.add('active');
+  if (id !== 'dychani' && breathRunning) stopBreath();
+}
+
+/* ───────── BREATHING ───────── */
+var breathRunning = false, breathPhaseIdx = 0, breathInterval = null;
+var bPhases = [
+  { label:'Nádech',   sec:4, cls:'expand', hint:'Pomalu se nadechni nosem.' },
+  { label:'Zadrž',    sec:4, cls:'hold',   hint:'Zadrž dech.' },
+  { label:'Výdech',   sec:6, cls:'shrink', hint:'Pomalu vydechni ústy.' },
+  { label:'Zadrž',    sec:2, cls:'',       hint:'Chvíle klidu.' }
+];
+function toggleBreath() {
+  breathRunning ? stopBreath() : startBreath();
+}
+function startBreath() {
+  breathRunning = true;
+  breathPhaseIdx = 0;
+  document.getElementById('b-btn').textContent = 'Stop';
+  runBreathPhase();
+}
+function runBreathPhase() {
+  if (!breathRunning) return;
+  var p = bPhases[breathPhaseIdx % bPhases.length];
+  var ring = document.getElementById('b-ring');
+  ring.className = 'breath-outer ' + p.cls;
+  document.getElementById('b-phase').textContent = p.label;
+  document.getElementById('b-hint').textContent = p.hint;
+  var s = p.sec;
+  document.getElementById('b-num').textContent = s;
+  clearInterval(breathInterval);
+  breathInterval = setInterval(function(){
+    s--;
+    document.getElementById('b-num').textContent = Math.max(0,s);
+    if (s <= 0) {
+      clearInterval(breathInterval);
+      if (breathRunning) { breathPhaseIdx++; runBreathPhase(); }
+    }
+  }, 1000);
+}
+function stopBreath() {
+  breathRunning = false;
+  clearInterval(breathInterval);
+  document.getElementById('b-ring').className = 'breath-outer';
+  document.getElementById('b-phase').textContent = '—';
+  document.getElementById('b-num').textContent = '4';
+  document.getElementById('b-hint').textContent = 'Stiskni Start a dýchej se mnou.';
+  document.getElementById('b-btn').textContent = 'Start';
+}
+
+/* ───────── FILTER ───────── */
+var apSecs = { u:'sec-u', s:'sec-s', k:'sec-k' };
+function filterAP(cat, btn) {
+  document.querySelectorAll('.chip').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  Object.keys(apSecs).forEach(function(k){
+    document.getElementById(apSecs[k]).style.display = (cat === 'vse' || cat === k) ? 'block' : 'none';
+  });
+}
+
+/* ───────── AUDIO ───────── */
+var activeAudioBtn = null;
+function playAudio(btn, text) {
+  if (window.speechSynthesis.speaking) {
+    window.speechSynthesis.cancel();
+    if (activeAudioBtn) { activeAudioBtn.classList.remove('playing'); activeAudioBtn.textContent = activeAudioBtn.textContent.replace('■','▶'); }
+    if (activeAudioBtn === btn) { activeAudioBtn = null; return; }
+  }
+  activeAudioBtn = btn;
+  btn.classList.add('playing');
+  btn.textContent = '■ Stop';
+  var u = new SpeechSynthesisUtterance(text);
+  u.lang = 'cs-CZ'; u.rate = 0.86; u.pitch = 1.0;
+  u.onend = function(){
+    btn.classList.remove('playing');
+    btn.textContent = '▶ Přehrát';
+    activeAudioBtn = null;
+  };
+  window.speechSynthesis.speak(u);
+}
+function copyTxt(btn, text) {
+  navigator.clipboard.writeText(text).catch(function(){});
+  var orig = btn.textContent;
+  btn.textContent = '✓ Zkopírováno';
+  setTimeout(function(){ btn.textContent = orig; }, 1800);
+}
+
+/* ───────── LOCKER ───────── */
+var lockEntries = [];
+function saveLock() {
+  var when = document.getElementById('lk-when').value.trim();
+  var who  = document.getElementById('lk-who').value.trim();
+  var what = document.getElementById('lk-what').value.trim();
+  if (!when && !what) return;
+  lockEntries.unshift({ when:when, who:who, what:what });
+  document.getElementById('lk-when').value = '';
+  document.getElementById('lk-who').value  = '';
+  document.getElementById('lk-what').value = '';
+  renderLocker();
+}
+function clearLock() { lockEntries = []; renderLocker(); }
+function renderLocker() {
+  document.getElementById('lk-log').innerHTML = lockEntries.map(function(e){
+    return '<div class="locker-entry"><strong>'+escH(e.when)+(e.who?' · '+escH(e.who):'')+'</strong><br>'+escH(e.what)+'</div>';
+  }).join('');
+}
+function escH(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+</body>
+</html>
